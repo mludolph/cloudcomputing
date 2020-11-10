@@ -73,6 +73,7 @@ gcloud compute instances create "cc-gcp-1" \
         --machine-type="e2-standard-2"\
         --tags="cloud-computing"
 
+# Resize the disk of compute instance "cc-gcp-1" to 100GB
 gcloud compute disks resize "cc-gcp-1" \
         --zone="europe-west1-b"
         --size=100
