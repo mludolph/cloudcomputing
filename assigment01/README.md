@@ -114,3 +114,10 @@ seqrd=$(sysbench fileio --file-num=1 --file-test-mode=seqrd --file-total-size=1G
 # format all benchmarked quantities as csv
 echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 ```
+
+## Exercise 3
+
+```
+
+
+```
