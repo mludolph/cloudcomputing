@@ -3,12 +3,20 @@
 ## Links
 
 [GCP docs](https://cloud.google.com/sdk/docs/quickstart#deb)
+[AWS CLI quickstart](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
 
 ## Setup
 
 Tested on WSL Ubuntu 20.04 on 10.11.2020
 
 ### AWS
+
+[IAM policies](https://console.aws.amazon.com/iam/home#/home)
+
+```sh
+aws configure
+
+```
 
 <span style="color:red">TODO</span>
 
@@ -36,6 +44,36 @@ gcloud config set project <project_name>
 ### AWS
 
 **`spinup-aws.sh`**
+
+```sh
+# Generate local key pair in file id_rsa and id_rsa.pub with
+# ccuser as comment and an empty passphrase
+ssh-keygen -t rsa -f id_rsa -C "ccuser" -N ''
+
+# make sure to create the default vpc in case it does not exist
+aws ec2 create-default-vpc
+
+# import public key
+aws ec2 import-key-pair --key-name "cckey"\
+                        --public-key-material="fileb://id_rsa.pub"
+
+# create security group for default vpc
+aws ec2 create-security-group --group-name="cc-group"\
+                              --description="CC VM group"
+
+aws ec2 authorize-security-group-ingress --group-name="cc-group"\
+                                         --protocol="tcp"\
+                                         --port=22
+
+aws ec2 authorize-security-group-ingress --group-name="cc-group"\
+                                         --protocol="icmp"\
+                                         --port=-1
+
+aws ec2 run-instance --image-id="ami-01d4d9d5d6b52b25e"\
+                     --instance-type="t2.large"\
+                     --security-groups="cc-group"\
+                     --
+```
 
 <span style="color: red;"> TODO </span>
 
@@ -106,7 +144,7 @@ timestamp=$(date +%s)
 cpu=$(sysbench cpu --time=$time run | grep -oP 'events per second:\s*\K[0-9]+.[0-9]+')
 # run memory benchmark with block size of 4KB and total size of 100TB and match the MiB transferred using a regex
 memory=$(sysbench memory --memory-block-size=4K --memory-total-size=100TB --time=$time run | grep -oP "MiB transferred \(\K[0-9]+.[0-9]+")
-# run random access disk read and sequential disk read benchmarks with 1 file of size 1GB 
+# run random access disk read and sequential disk read benchmarks with 1 file of size 1GB
 # and direct disk access and match the read MiB/s using a regex
 rndrd=$(sysbench fileio --file-num=1 --file-test-mode=rndrd --file-total-size=1GB --file-extra-flags=direct --time=$time run | grep -oP "read, MiB\/s:\s*\K[0-9]+\.[0-9]+")
 seqrd=$(sysbench fileio --file-num=1 --file-test-mode=seqrd --file-total-size=1GB --file-extra-flags=direct --time=$time run | grep -oP "read, MiB\/s:\s*\K[0-9]+\.[0-9]+")
