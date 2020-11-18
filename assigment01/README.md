@@ -100,7 +100,7 @@ $ ssh -i id_rsa ubuntu@public_ip
 # COPY run_bench.sh to ~/run_bench.sh
 $ chmod +x run_bench.sh
 $ sudo apt update && sudo apt install -y sysbench
-$ (crontab -l; echo "0,30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -
+$ (crontab -l 2>/dev/null; echo "*/30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -
 ```
 
 #### Teardown
@@ -160,7 +160,7 @@ $ ssh ccuser@35.233.48.201 -i id_rsa
 # COPY run_bench.sh to ~/run_bench.sh
 $ chmod +x run_bench.sh
 $ sudo apt update && sudo apt install -y sysbench
-$ (crontab -l; echo "0,30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -
+$ (crontab -l 2>/dev/null; echo "*/30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -
 
 ```
 
@@ -202,7 +202,7 @@ echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 
 ### Crontab Entry
 
-`(crontab -l; echo "0,30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -`
+`(crontab -l 2>/dev/null; echo "*/30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -`
 
 ## Exercise 3
 
