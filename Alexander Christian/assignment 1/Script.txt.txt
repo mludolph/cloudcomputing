@@ -1,0 +1,69 @@
+
+awsSpinup
+
+#!/bin/bash
+
+#ensures there is a default VPC network 
+aws ec2 create-default-vpc
+#imports-key-pair
+aws ec2 import-key-pair --key-name "my-key" --public-key-material fileb://~/id_rsa2.pub
+#creates a security group
+aws ec2 create-security-group --group-name "authIncICMP" --description "allow incoming ICMP" --vpc-id "vpc-c09347bd"
+#adds the allowance for incoming SSH traffic
+aws ec2 authorize-security-group-ingress --group-name "authIncICMP" --protocol "tcp" --port 22 --source-group "authIncICMP"
+#adds the allowance for incoming ICMP traffic
+aws ec2 authorize-security-group-ingress --group-name authIncICMP --protocol "icmp" --port -1 --source-group "authIncICMP"
+#start instance
+aws ec2 run-instances --instance-type t2.large --key-name "my-key" --image-id="ami-08b277333b9511393" --security-groups "authIncICMP"
+#resize volume
+#volumeId = aws ec2 describe-volumes grep -wirn "InstanceId" | cut -d":" -f3 |cut -d" " -f2 | cut -d"," -f1
+#aws ec2 modify-volume --size 100 --volume-id $volumeId
+
+==========================================================================================================================================================
+
+gcSpinup
+
+#!/bin/bash
+#creates a new ssh key 
+ssh-keygen -t rsa -f ~/id_rsa -N ' ' -C ik78evah
+#restricts access
+chmod 400 ~/id_rsa 
+#formats the ssh key adding the username to the beginning of the string
+echo -n "ik78evah:" > temp
+cat id_rsa.pub >> temp
+cat temp > id_rsa.pub
+rm temp
+#sets "project practical-assignment-no-1" to the active configuration
+gcloud config set project practical-assignment-no-1
+#uploads the ssh public key
+gcloud compute config-ssh --ssh-key-file=~/id_rsa
+#Create firewall rule allowing incoming ICMP
+gcloud compute firewall-rules create myrule1 --allow ICMP --direction=INGRESS --source-tags cloud-computing
+#Create firewall rule allowing incoming SSH by allowing incoming at the standard SSH gate: TCP:22
+gcloud compute firewall-rules create myrule2 --allow TCP:22 --direction=INGRESS --source-tags cloud-computing
+#Launch instance in central us with an ubuntu 18.04 image
+gcloud compute instances create instance-1 --zone=us-central1-a --machine-type=e2-standard-2 --image=ubuntu-1804-bionic-v20201111 --image-project=ubuntu-os-cloud
+#resize the disk to 100GB
+gcloud compute disks resize instance-1 --size=100GB --zone=us-central1-a
+
+#*/30 * * * * /home/benchScript.sh >> gcp_results.csv
+
+============================================================================================================================================================
+
+BenchScript
+
+#!/bin/bash
+clear
+if ! -f "output.txt"; then
+touch output.txt
+fi
+date +%s | tr -d "\n"
+echo -n ","
+sysbench --test=cpu --time=10 run | grep "events per second:" |  cut -d ":" -f2 | cut -d " " -f3 | tr -d "\n"
+echo -n ","
+sysbench --test=memory --time=10 --memory-block-size=4KB --memory-total-size=100TB run | grep "MiB transferred" | cut -d "(" -f2 | cut -d " " -f1 | tr -d "\n"
+echo -n ","
+sysbench --test=fileio --file-total-size=1G --file-num=1 prepare > /dev/null
+sysbench --test=fileio  --file-num=1 --file-total-size=1GB --file-test-mode=rndrd --file-async-backlog=direct --time=10 run | grep "read, MiB/s:" | cut -d " " -f24 | tr -d "\n"
+echo -n ","
+sysbench --test=fileio  --file-num=1 --file-total-size=1GB --file-test-mode=seqrd --file-async-backlog=direct --time=10 run | grep "read, MiB/s:" | cut -d " " -f24
