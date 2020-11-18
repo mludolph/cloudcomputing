@@ -185,7 +185,7 @@ echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 
 ### Crontab Entry
 
-`(crontab -l; echo $("0,30 * * * *  ~/run_bench.sh") ) | crontab -`
+`(crontab -l; echo "0,30 * * * *  ~/cloud_proj/run_bench.sh" ) | crontab -`
 
 ## Exercise 3
 
