@@ -183,6 +183,10 @@ seqrd=$(sysbench fileio --file-num=1 --file-test-mode=seqrd --file-total-size=1G
 echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 ```
 
+### Crontab Entry
+
+`(crontab -l; echo $("0,30 * * * *  ~/run_bench.sh") ) | crontab -`
+
 ## Exercise 3
 
 ```
