@@ -1,4 +1,3 @@
-# Generate local key pair in file id_rsa and id_rsa.pub with
 # ccuser as comment and a passphrase
 ssh-keygen -t rsa -f id_rsa -C "ccuser" -N 'replaced'
 
@@ -39,3 +38,6 @@ volume_id=$(aws ec2 describe-instances | grep -Po "vol-[^\"]+")
 # resize the volume to 100GB
 aws ec2 modify-volume --volume-id="$volume_id"\
                       --size="100"
+
+# alternatively, create volume incase it doesnt work
+aws ec2 create-volume --availability-zone="eu-central-1a" --size=100
