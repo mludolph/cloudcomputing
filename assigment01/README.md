@@ -47,8 +47,8 @@ gcloud config set project <project_name>
 
 ```sh
 # Generate local key pair in file id_rsa and id_rsa.pub with
-# ccuser as comment and an empty passphrase
-ssh-keygen -t rsa -f id_rsa -C "ccuser" -N ''
+# ccuser as comment and a passphrase
+ssh-keygen -t rsa -f id_rsa -C "ccuser" -N 'replaced'
 
 # make sure to create the default vpc in case it does not exist
 aws ec2 create-default-vpc
@@ -61,21 +61,42 @@ aws ec2 import-key-pair --key-name "cckey"\
 aws ec2 create-security-group --group-name="cc-group"\
                               --description="CC VM group"
 
-aws ec2 authorize-security-group-ingress --group-name="cc-group"\
+aws ec2 authorize-security-group-ingress --group-id="sg-0bfbb567bb4836e34"\
                                          --protocol="tcp"\
-                                         --port=22
+                                         --port=22\
+                                         --cidr="0.0.0.0/0"
 
 aws ec2 authorize-security-group-ingress --group-name="cc-group"\
                                          --protocol="icmp"\
-                                         --port=-1
+                                         --port=-1\
+                                         --cidr="0.0.0.0/0"
 
 aws ec2 run-instance --image-id="ami-01d4d9d5d6b52b25e"\
                      --instance-type="t2.large"\
                      --security-groups="cc-group"\
-                     --
+                     --key-name="cckey"
+
+volume_id=$(aws ec2 describe-instances | grep -Po "vol-[^\"]+")
+
+aws ec2 modify-volume --volume-id="$volume_id"\
+                      --size="100"
 ```
 
-<span style="color: red;"> TODO </span>
+#### SSHing into the AWS instance
+
+```sh
+$ public_ip=$(aws ec2 describe-instances | grep "PublicIpAddress" | grep -Po "(?:[0-9]{1,3}\.){3}[0-9]{1,3}") # retrieve public ip
+$ chmod 400 id_rsa
+$ ssh -i id_rsa ubuntu@public_ip
+
+```
+
+#### Teardown
+
+```sh
+$ instance_id=$(aws ec2 describe-instances | grep "InstanceId" | grep -Po "i-[^\"]+")
+$ aws ec2 terminate-instances --instance-id="$instance_id"
+```
 
 ### GCP
 
@@ -141,9 +162,9 @@ sysbench fileio --file-num=1 --file-total-size=1GB prepare > /dev/null
 timestamp=$(date +%s)
 
 # run cpu benchmark (no additional requirements stated) and match events per second using regex
-cpu=$(sysbench cpu --time=$time run | grep -oP 'events per second:\s*\K[0-9]+.[0-9]+')
+cpu=$(sysbench cpu --time=$time run | grep -oP 'events per second:\s*\K[0-9]+\.[0-9]+')
 # run memory benchmark with block size of 4KB and total size of 100TB and match the MiB transferred using a regex
-memory=$(sysbench memory --memory-block-size=4K --memory-total-size=100TB --time=$time run | grep -oP "MiB transferred \(\K[0-9]+.[0-9]+")
+memory=$(sysbench memory --memory-block-size=4K --memory-total-size=100TB --time=$time run | grep -oP "MiB transferred \(\K[0-9]+\.[0-9]+")
 # run random access disk read and sequential disk read benchmarks with 1 file of size 1GB
 # and direct disk access and match the read MiB/s using a regex
 rndrd=$(sysbench fileio --file-num=1 --file-test-mode=rndrd --file-total-size=1GB --file-extra-flags=direct --time=$time run | grep -oP "read, MiB\/s:\s*\K[0-9]+\.[0-9]+")
