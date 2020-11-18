@@ -45,8 +45,7 @@ gcloud config set project <project_name>
 
 **`spinup-aws.sh`**
 
-```sh
-# Generate local key pair in file id_rsa and id_rsa.pub with
+```sh# Generate local key pair in file id_rsa and id_rsa.pub with
 # ccuser as comment and a passphrase
 ssh-keygen -t rsa -f id_rsa -C "ccuser" -N 'replaced'
 
@@ -61,23 +60,30 @@ aws ec2 import-key-pair --key-name "cckey"\
 aws ec2 create-security-group --group-name="cc-group"\
                               --description="CC VM group"
 
-aws ec2 authorize-security-group-ingress --group-id="sg-0bfbb567bb4836e34"\
+# create ssh rule for newly created security group allowing port tcp/22
+aws ec2 authorize-security-group-ingress --group-name="cc-group"\
                                          --protocol="tcp"\
                                          --port=22\
                                          --cidr="0.0.0.0/0"
 
+# create icmp rule for security group allowing all icmp ports
 aws ec2 authorize-security-group-ingress --group-name="cc-group"\
                                          --protocol="icmp"\
                                          --port=-1\
                                          --cidr="0.0.0.0/0"
 
+# create a new ec2 instance with an Ubuntu 18.04 image, t2.large type, the
+# security group and add our key
 aws ec2 run-instance --image-id="ami-01d4d9d5d6b52b25e"\
                      --instance-type="t2.large"\
                      --security-groups="cc-group"\
                      --key-name="cckey"
 
+# retrieve volume_id to resize volume 
+# (care: when multiple instances are running, this might resize the wrong volume)
 volume_id=$(aws ec2 describe-instances | grep -Po "vol-[^\"]+")
 
+# resize the volume to 100GB
 aws ec2 modify-volume --volume-id="$volume_id"\
                       --size="100"
 ```
