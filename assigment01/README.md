@@ -114,7 +114,7 @@ $ aws ec2 terminate-instances --instance-id="$instance_id"
 ```sh
 # Generate local key pair in file id_rsa and id_rsa.pub with
 # ccuser as comment and an empty passphrase
-ssh-keygen -t rsa -f id_rsa -C "ccuser" -N ''
+ssh-keygen -t rsa -f id_rsa -C "ccuser" -N 'replaced'
 
 # Save a GCP formatted copy to gcp_key.pub by inserting "[USERNAME]:"
 # in front of the public key in id_rsa.pub
@@ -146,8 +146,17 @@ gcloud compute disks resize "cc-gcp-1" \
         --zone="europe-west1-b"
         --size=100
 ```
+### SSHing
 
-**Teardown (don't include)**:
+```sh
+$ gcloud compute instances list 
+NAME      ZONE            MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP    STATUS
+cc-gcp-1  europe-west1-b  e2-standard-2               10.132.0.3   35.233.48.201  RUNNING
+$ ssh ccuser@35.233.48.201 -i id_rsa
+
+```
+
+**Teardown**:
 
 ```sh
 gcloud compute instances delete "cc-gcp-1"

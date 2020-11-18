@@ -1,6 +1,6 @@
 # Generate local key pair in file id_rsa and id_rsa.pub with
 # ccuser as comment and an empty passphrase
-ssh-keygen -t rsa -f id_rsa -C "ccuser" -N ''
+ssh-keygen -t rsa -f id_rsa -C "ccuser" -N 'replaced'
 
 # Save a GCP formatted copy to gcp_key.pub by inserting "[USERNAME]:"
 # in front of the public key in id_rsa.pub
@@ -29,5 +29,5 @@ gcloud compute instances create "cc-gcp-1" \
 
 # Resize the disk of compute instance "cc-gcp-1" to 100GB
 gcloud compute disks resize "cc-gcp-1" \
-        --zone="europe-west1-b"
+        --zone="europe-west1-b"\
         --size=100
