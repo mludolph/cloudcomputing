@@ -79,7 +79,7 @@ aws ec2 run-instance --image-id="ami-01d4d9d5d6b52b25e"\
                      --security-groups="cc-group"\
                      --key-name="cckey"
 
-# retrieve volume_id to resize volume 
+# retrieve volume_id to resize volume
 # (care: when multiple instances are running, this might resize the wrong volume)
 volume_id=$(aws ec2 describe-instances | grep -Po "vol-[^\"]+")
 
@@ -91,13 +91,16 @@ aws ec2 modify-volume --volume-id="$volume_id"\
 aws ec2 create-volume --availability-zone="eu-central-1a" --size=100
 ```
 
-#### SSHing into the AWS instance
+#### Benchmark setup
 
 ```sh
 $ public_ip=$(aws ec2 describe-instances | grep "PublicIpAddress" | grep -Po "(?:[0-9]{1,3}\.){3}[0-9]{1,3}") # retrieve public ip
 $ chmod 400 id_rsa
 $ ssh -i id_rsa ubuntu@public_ip
-
+# COPY run_bench.sh to ~/run_bench.sh
+$ chmod +x run_bench.sh
+$ sudo apt update && sudo apt install -y sysbench
+$ (crontab -l; echo "0,30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -
 ```
 
 #### Teardown
@@ -146,13 +149,18 @@ gcloud compute disks resize "cc-gcp-1" \
         --zone="europe-west1-b"
         --size=100
 ```
+
 ### SSHing
 
 ```sh
-$ gcloud compute instances list 
+$ gcloud compute instances list
 NAME      ZONE            MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP    STATUS
 cc-gcp-1  europe-west1-b  e2-standard-2               10.132.0.3   35.233.48.201  RUNNING
 $ ssh ccuser@35.233.48.201 -i id_rsa
+# COPY run_bench.sh to ~/run_bench.sh
+$ chmod +x run_bench.sh
+$ sudo apt update && sudo apt install -y sysbench
+$ (crontab -l; echo "0,30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -
 
 ```
 
@@ -194,7 +202,7 @@ echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 
 ### Crontab Entry
 
-`(crontab -l; echo "0,30 * * * *  ~/cloud_proj/run_bench.sh" ) | crontab -`
+`(crontab -l; echo "0,30 * * * * ~/run_bench.sh >> ~/benchmark.log" ) | crontab -`
 
 ## Exercise 3
 
