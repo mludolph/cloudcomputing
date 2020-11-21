@@ -26,10 +26,10 @@ aws ec2 authorize-security-group-ingress --group-name="cc-group"\
 
 # create a new ec2 instance with an Ubuntu 18.04 image, t2.large type, the
 # security group and add our key
-aws ec2 run-instance --image-id="ami-01d4d9d5d6b52b25e"\
-                     --instance-type="t2.large"\
-                     --security-groups="cc-group"\
-                     --key-name="cckey"
+aws ec2 run-instances --image-id="ami-01d4d9d5d6b52b25e"\
+                      --instance-type="t2.large"\
+                      --security-groups="cc-group"\
+                      --key-name="cckey"
 
 # retrieve volume_id to resize volume 
 # (care: when multiple instances are running, this might resize the wrong volume)
