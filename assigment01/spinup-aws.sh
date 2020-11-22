@@ -33,7 +33,7 @@ aws ec2 run-instances --image-id="ami-01d4d9d5d6b52b25e"\
 
 # retrieve volume_id to resize volume 
 # (care: when multiple instances are running, this might resize the wrong volume)
-volume_id=$(aws ec2 describe-instances | grep -Po "vol-[^\"]+")
+# volume_id=$(aws ec2 describe-instances | grep -Po "vol-[^\"]+")
 
 # resize the volume to 100GB
 # aws ec2 modify-volume --volume-id="$volume_id" --size="100"

@@ -1,5 +1,5 @@
 # length of individual benchmarks in seconds set to 60
-time=60
+time=5
 
 # prepare file benchmark with 1 file of size 1GB, discard output
 sysbench fileio --file-num=1 --file-total-size=1GB prepare > /dev/null
