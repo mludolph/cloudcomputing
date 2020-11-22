@@ -242,8 +242,8 @@ echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 
 (The sudden drop in performance in AWS disk performance is most probably due to some "write quota" we hit since we used the cleanup command on each run, resulting in writing the test file for each benchmark. We couldn't figure out how high this quota is and had no time to rerun the full benchmark without the cleanup command.)
 
-The VM on GCP outperforms AWS in CPU, sequential disk read and memory performance but shows a very high fluctutation in performance. AWS meanwhile outperforms GCP on random read disk speed. 
+The VM on GCP outperforms AWS in CPU, sequential disk read and memory performance but shows a very high fluctutation in performance. AWS meanwhile outperforms GCP on random read disk speed.
 
-Computationally intensive applications or in-memory databases would benefit from the high memory speed and CPU speed on GCP, but might be subject to performance fluctuations thus should not be mission critical. An example for this would be some kind of data analysis task.
+Computationally intensive applications or in-memory databases would benefit from the high memory speed and CPU speed on GCP, but might be subject to performance fluctuations thus should not be mission critical. An example for this would be some kind of data analysis application.
 
 Applications with a lot of mixed random and sequential disk access would benefit from running on AWS, since those speeds do not differ as much as on GCP. A simple database service (e.g. a users service for a social network), where you cannot make any assumptions about the pattern the data is accessed, would benefit from the random disk speed without needing high CPU performance.
