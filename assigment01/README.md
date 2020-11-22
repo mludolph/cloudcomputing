@@ -220,11 +220,11 @@ echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 
 1. Shortly describe, how sysbench measures memory performance.
 
-   To tests memory performance, sysbench allocates a memory buffer and then writes and reads from it using the specified amount of threads (here 1), each time for the size of a pointer (so 32bit or 64bit) until the buffer (--memory-block-size) is full. This This is then repeated until the provided volume (--memory-total-size) or the execution time is reached. The resulting throughput in MiB/s then is a measure for the memory performance.
+   To test memory performance, sysbench allocates a memory buffer and then writes and reads from it using the specified amount of threads (here 1), each time for the size of a pointer (so 32bit or 64bit) until the buffer (--memory-block-size) is full. This is then repeated until the provided volume (--memory-total-size) or the execution time is reached. The resulting throughput in MiB/s then is a measure for the memory performance.
 
 2. How would you expect virtualization to affect the memory benchmark? Why?
 
-   The hypervisor adds additional latency to requests to physical resources. Addtionally to the added latency, other guests might also delay the availability to the CPU or memory, thus degrading the memory benchmark performance.
+   A hypervisor adds additional latency to requests to physical resources. like the CPU or memory. Addtionally to the added latency, other guests might also delay the availability to the CPU or memory, thus degrading the memory benchmark performance.
 
 ### Disk benchmark questions:
 
