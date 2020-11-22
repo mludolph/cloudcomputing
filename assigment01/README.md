@@ -240,6 +240,8 @@ echo $timestamp,$cpu,$memory,$rndrd,$seqrd
 
 1. Compare the overall long-term measurement plots for the two platforms AWS and GCP. Name one type of application that you would expect to perform better on AWS, and one that would perform better on GCP, respectively. Shortly explain your decisions.
 
-(The sudden drop in performance in AWS disk performance is most probably due to some quota we hit since we used the the cleanup command on each run, resulting in writing the file for each benchmark. We couldnt figure out how high this quota is and had no time to rerun the benchmark without recreating the file.)
+(The sudden drop in performance in AWS disk performance is most probably due to some "write quota" we hit since we used the cleanup command on each run, resulting in writing the test file for each benchmark. We couldn't figure out how high this quota is and had no time to rerun the full benchmark without the cleanup command.)
 
-The VM on GCP outperforms AWS in CPU, sequential disk read and memory but show a very high fluctutation in performance. AWS meanwhile outperforms AWS on random read disk speed. Computationally intensive applications or in-memory databases would benefit from the high memory speed and CPU speed on GCP, but might be subject to performance fluctuations thus should not be mission critical. Applications with a lot of mixed random and sequential disk access would benefit from running on AWS, since those speeds do not differ as much as on GCP. 
+The VM on GCP outperforms AWS in CPU, sequential disk read and memory performance but shows a very high fluctutation in performance. AWS meanwhile outperforms GCP on random read disk speed. 
+
+Computationally intensive applications or in-memory databases would benefit from the high memory speed and CPU speed on GCP, but might be subject to performance fluctuations thus should not be mission critical. Applications with a lot of mixed random and sequential disk access would benefit from running on AWS, since those speeds do not differ as much as on GCP.
