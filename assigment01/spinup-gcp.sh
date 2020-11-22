@@ -31,3 +31,6 @@ gcloud compute instances create "cc-gcp-1" \
 gcloud compute disks resize "cc-gcp-1" \
         --zone="europe-west1-b"\
         --size=100
+
+# crontab
+(crontab -l 2>/dev/null; echo "*/30 * * * * ~/run_bench.sh >> ~/gcp_results.csv" ) | crontab -

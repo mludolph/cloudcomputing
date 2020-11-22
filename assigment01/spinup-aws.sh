@@ -41,3 +41,6 @@ aws ec2 modify-volume --volume-id="$volume_id"\
 
 # alternatively, create volume incase it doesnt work
 aws ec2 create-volume --availability-zone="eu-central-1a" --size=100
+
+# crontab
+(crontab -l 2>/dev/null; echo "*/30 * * * * ~/run_bench.sh >> ~/aws_results.csv" ) | crontab -
