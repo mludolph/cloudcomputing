@@ -36,11 +36,10 @@ aws ec2 run-instances --image-id="ami-01d4d9d5d6b52b25e"\
 volume_id=$(aws ec2 describe-instances | grep -Po "vol-[^\"]+")
 
 # resize the volume to 100GB
-aws ec2 modify-volume --volume-id="$volume_id"\
-                      --size="100"
+# aws ec2 modify-volume --volume-id="$volume_id" --size="100"
 
 # alternatively, create volume incase it doesnt work
 aws ec2 create-volume --availability-zone="eu-central-1a" --size=100
 
-# crontab
-(crontab -l 2>/dev/null; echo "*/30 * * * * ~/run_bench.sh >> ~/aws_results.csv" ) | crontab -
+# crontab entry with redirection to output file
+# (crontab -l 2>/dev/null; echo "*/30 * * * * ~/run_bench.sh >> ~/aws_results.csv" ) | crontab -
