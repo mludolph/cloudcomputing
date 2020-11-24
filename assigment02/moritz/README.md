@@ -94,18 +94,30 @@ gcloud compute firewall-rules create "cc-network1-fw3"\
 **Testing setup**:
 
 ```sh
-$ ssh -i id_rsa ccuser@<PUBLIC_IP>
+# for each instance
+VM1_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+VM1_INTERNAL_IP1=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].networkIP)' --zone="europe-west1-b")
+VM1_INTERNAL_IP2=$(gcloud compute instances describe controller --format='get(networkInterfaces[1].networkIP)' --zone="europe-west1-b")
+VM2_EXTERNAL_IP=$(gcloud compute instances describe compute1 --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+VM2_INTERNAL_IP1=$(gcloud compute instances describe compute1 --format='get(networkInterfaces[0].networkIP)' --zone="europe-west1-b")
+VM2_INTERNAL_IP2=$(gcloud compute instances describe compute1 --format='get(networkInterfaces[1].networkIP)' --zone="europe-west1-b")
+VM3_EXTERNAL_IP=$(gcloud compute instances describe compute2 --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+VM3_INTERNAL_IP1=$(gcloud compute instances describe compute2 --format='get(networkInterfaces[0].networkIP)' --zone="europe-west1-b")
+VM3_INTERNAL_IP2=$(gcloud compute instances describe compute2 --format='get(networkInterfaces[1].networkIP)' --zone="europe-west1-b")
+
+# Do this for all VMs (note down the internal ips to access them inside the vm)
+ssh -i id_rsa ccuser@$VM1_EXTERNAL_IP "grep -cw /proc/cpuinfo"
 $ grep -cw vmx /proc/cpuinfo
 > 52
 $ ifconfig # has to show 2 internal ips
-$ ping <VM_1_INTERNAL_IP1> # all other machines have to be reachable
-$ ping <VM_1_INTERNAL_IP2>
-$ ping <VM_2_INTERNAL_IP1>
-$ ping <VM_2_INTERNAL_IP2>
-$ nc -z -v <VM_1_INTERNAL_IP1> 22 # tcp traffic to all other machines has to work
-$ nc -z -v <VM_1_INTERNAL_IP2> 22
-$ nc -z -v <VM_2_INTERNAL_IP1> 22
-$ nc -z -v <VM_2_INTERNAL_IP2> 22
+$ ping <VM1_INTERNAL_IP1> # all other machines have to be reachable
+$ ping <VM1_INTERNAL_IP2>
+$ ping <VM2_INTERNAL_IP1>
+$ ping <VM2_INTERNAL_IP2>
+$ nc -z -v <VM1_INTERNAL_IP1> 22 # tcp traffic to all other machines has to work
+$ nc -z -v <VM1_INTERNAL_IP2> 22
+$ nc -z -v <VM2_INTERNAL_IP1> 22
+$ nc -z -v <VM2_INTERNAL_IP2> 22
 ```
 
 **Teardown**:
