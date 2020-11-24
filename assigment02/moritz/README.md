@@ -2,6 +2,8 @@
 
 ## 1. Virtual Machines
 
+`spinup-gcp-for-openstack.sh`
+
 ```sh
 # create cc-network1 and cc-network2 with custom subnet mode
 gcloud compute networks create "cc-network1"\
