@@ -155,3 +155,32 @@ ssh ccuser@$VM3_EXTERNAL_IP -i id_rsa
 # ssh into all machines and remove all entries with "Added by Google"
 sudo nano /etc/hosts
 ```
+
+## Exericse 3
+
+### OpenStack Client
+
+```sh
+# install openstack cli
+pip install python-openstackclient
+
+# get password from passwords.yml
+cat passwords.yml | grep "keystone_admin_password"
+
+# Get the controller IP (`echo $VM1_EXTERNAL_IP`) and open the brower
+# login with admin & the password from above
+
+# Download the admin-openrc.sh (dropdown upper right corner) and
+source admin-openrc.sh
+
+# test openstack CLI
+openstack host list
+
+# run the scripts
+chmod +x *.sh
+./import-images.sh
+./create-ext-network.sh
+
+```
+
+###
