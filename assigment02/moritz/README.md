@@ -183,4 +183,53 @@ chmod +x *.sh
 
 ```
 
+`prepare-openstack.sh`
+
+```sh
+
+# create security group "open-all"
+openstack security group create open-all
+# add wide open rules for all tcp/udp and icmp traffic to the newly created security group
+openstack security group rule create --proto tcp --remote-ip 0.0.0.0/0 --dst-port 1:65525 open-all
+openstack security group rule create --proto udp --remote-ip 0.0.0.0/0 --dst-port 1:65525 open-all
+openstack security group rule create --proto icmp --remote-ip 0.0.0.0/0 open-all
+
+# create keypair for openstack
+openstack keypair create openstack_id_rsa > openstack_id_rsa
+VM1_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+scp -i id_rsa openstack_id_rsa ccuser@$VM1_EXTERNAL_IP:/home/ccuser/openstack_id_rsa
+ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa chmod 400 openstack_id_rsa
+
+# create VM instance with ubuntu image, medium flavor, admin-net, default security group and the imported public key
+nova boot --image="ubuntu-16.04"\
+          --flavor="m1.medium"\
+          --nic net-name="admin-net"\
+          --security-groups="open-all"\
+          --key-name="openstack_id_rsa"\
+          instance1
+
+# allocate floating ip and retrieve it from the output
+floating_ip=$(openstack floating ip create --project admin\
+                             --subnet external-sub external\
+                             --format="value"\
+                             --column="floating_ip_address")
+
+
+# associate the floating ip to the instance we created earlier
+openstack server add floating ip instance1 $floating_ip
+```
+
+```sh
+# copy iptables-magic.sh to controller vm
+scp -i id_rsa ../iptables-magic.sh ccuser@$VM1_EXTERNAL_IP:/home/ccuser/iptables-magic.sh
+ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa chmod +x iptables-magic.sh && sudo sh iptables-magic.sh
+
+# ssh to the gc controller (make note of the floating ip)
+ssh ccuser@$VM1_EXTERNAL_IP
+
+# from within the gc controller, ssh into the vm
+ssh ubuntu@<FLOATING_IP> -i openstack_id_rsa
+
+```
+
 ###
