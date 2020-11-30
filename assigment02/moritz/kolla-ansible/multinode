@@ -1,18 +1,18 @@
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
-ansible_user=[******user name on gc VMs******]
+ansible_user=ccuser
 ansible_become=True
-ansible_private_key_file=[******Path to private key file used to connect to gc VMs******
+ansible_private_key_file=../id_rsa
 
 [control]
-[******public IP of controller VM******]
+35.241.209.82
 
 [network:children]
 control
 
 [compute]
-[******public IP of compute1 VM******]
-[******public IP of compute2 VM******]
+35.195.9.64
+34.76.247.136
 
 [monitoring:children]
 control
