@@ -15,7 +15,7 @@ gcloud compute networks create "cc-network2"\
 gcloud compute networks subnets create "cc-subnet1"\
                                        --network="cc-network1"\
                                        --range="10.1.0.0/16"\
-                                       --secondary-range="secondary"="10.3.0.0/16"\
+                                       --secondary-range="vm-range"="172.16.0.0/20"\
                                        --region="europe-west1"
 
 # create cc-subnet2 for cc-network2 with subnet range 10.2.0.0/16
@@ -43,8 +43,9 @@ gcloud compute instances create "controller"\
                                 --machine-type="n2-standard-2"\
                                 --image="nested-vm-image"\
                                 --tags="cc"\
-                                --network-interface subnet="cc-subnet1",aliases="secondary":"10.3.0.0/16"\
-                                --network-interface subnet="cc-subnet2"
+                                --network-interface subnet="cc-subnet1",aliases="vm-range":"172.16.1.0/24"\
+                                --network-interface subnet="cc-subnet2"\
+                                --can-ip-forward
 
 # create compute1, compute2 vm instances as type n2-standard-2 using the nested-vm-image, cc tag and the two subnets
 gcloud compute instances create "compute1"\
@@ -147,6 +148,9 @@ cp -r <path_to_venv>/share/kolla-ansible/etc_examples/kolla/* /etc/kolla
 ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa
 ssh ccuser@$VM2_EXTERNAL_IP -i id_rsa
 ssh ccuser@$VM3_EXTERNAL_IP -i id_rsa
+
+cd kolla-ansible
+ansible -m ping all -i ./multinode
 ```
 
 ### Fixing RabbitMQ hostname bug
@@ -196,9 +200,9 @@ openstack security group rule create --proto icmp --remote-ip 0.0.0.0/0 open-all
 
 # create keypair for openstack
 openstack keypair create openstack_id_rsa > openstack_id_rsa
-VM1_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
-scp -i id_rsa openstack_id_rsa ccuser@$VM1_EXTERNAL_IP:/home/ccuser/openstack_id_rsa
-ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa chmod 400 openstack_id_rsa
+CONTROLLER_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+scp -i id_rsa openstack_id_rsa ccuser@$CONTROLLER_EXTERNAL_IP:/home/ccuser/openstack_id_rsa
+ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa chmod 400 openstack_id_rsa
 
 # create VM instance with ubuntu image, medium flavor, admin-net, default security group and the imported public key
 nova boot --image="ubuntu-16.04"\
@@ -222,14 +226,39 @@ openstack server add floating ip instance1 $floating_ip
 ```sh
 # copy iptables-magic.sh to controller vm
 scp -i id_rsa ../iptables-magic.sh ccuser@$VM1_EXTERNAL_IP:/home/ccuser/iptables-magic.sh
-ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa chmod +x iptables-magic.sh && sudo sh iptables-magic.sh
+ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa chmod +x iptables-magic.sh
+ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa sudo sh iptables-magic.sh
 
 # ssh to the gc controller (make note of the floating ip)
-ssh ccuser@$VM1_EXTERNAL_IP
+ssh ccuser@$VM1_EXTERNAL_IP -i id_rsa
 
 # from within the gc controller, ssh into the vm
 ssh ubuntu@<FLOATING_IP> -i openstack_id_rsa
 
 ```
 
-###
+### Making accessible from external
+
+```sh
+CONTROLLER_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+
+# specify alias ip range and floating ip range
+ALIAS_IP_RANGE=172.16.1.0/24
+FLOATING_IP_RANGE=10.122.0.0/24
+
+# add netmapping of alias ip range to floating ip range
+# this allows addresses of kind 172.16.1.xxx be routed to 10.122.0.xxx
+# ip forwarding is enabled by default
+ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A PREROUTING -d $ALIAS_IP_RANGE -i ens4 -j NETMAP --to $FLOATING_IP_RANGE
+ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A POSTROUTING -s $FLOATING_IP_RANGE -j MASQUERADE
+
+```
+
+## Exercise 4
+
+
+```
+sudo apt-get update
+sudo apt-get install sysbench bc
+
+```

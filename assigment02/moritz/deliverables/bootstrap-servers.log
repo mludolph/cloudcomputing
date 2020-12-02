@@ -1,367 +1,367 @@
 Bootstrapping servers : ansible-playbook -i ./multinode -e @/home/mludolph/uni/cloudcomputing/assigment02/moritz/kolla-ansible/globals.yml -e @./passwords.yml -e CONFIG_DIR=/home/mludolph/uni/cloudcomputing/assigment02/moritz/kolla-ansible  -e kolla_action=bootstrap-servers /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/kolla-host.yml 
 
-PLAY [Gather facts for all hosts] ***************************************************************************************************
+PLAY [Gather facts for all hosts] ***********************************************************************************************************
 
-TASK [Gathering Facts] **************************************************************************************************************
+TASK [Gathering Facts] **********************************************************************************************************************
 ok: [localhost]
-ok: [34.76.247.136]
-ok: [35.241.209.82]
-ok: [35.195.9.64]
+ok: [34.78.12.182]
+ok: [35.195.29.29]
+ok: [35.189.217.16]
 
-TASK [Group hosts to determine when using --limit] **********************************************************************************
-changed: [35.241.209.82]
-changed: [35.195.9.64]
-changed: [34.76.247.136]
+TASK [Group hosts to determine when using --limit] ******************************************************************************************
+changed: [34.78.12.182]
+changed: [35.195.29.29]
+changed: [35.189.217.16]
 changed: [localhost]
 
-PLAY [Gather facts for all hosts (if using --limit)] ********************************************************************************
+PLAY [Gather facts for all hosts (if using --limit)] ****************************************************************************************
 skipping: no hosts matched
 
-PLAY [Apply role baremetal] *********************************************************************************************************
-
-TASK [baremetal : include_tasks] ****************************************************************************************************
-included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/bootstrap-servers.yml for 35.241.209.82, 35.195.9.64, 34.76.247.136
-
-TASK [baremetal : include_tasks] ****************************************************************************************************
-included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/pre-install.yml for 35.241.209.82, 35.195.9.64, 34.76.247.136
-
-TASK [baremetal : Ensure localhost in /etc/hosts] ***********************************************************************************
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-
-TASK [baremetal : Ensure hostname does not point to 127.0.1.1 in /etc/hosts] ********************************************************
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-
-TASK [baremetal : Generate /etc/hosts for all of the nodes] *************************************************************************
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-changed: [34.76.247.136]
-
-TASK [baremetal : Ensure /etc/cloud/cloud.cfg exists] *******************************************************************************
-ok: [35.241.209.82]
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-
-TASK [baremetal : Disable cloud-init manage_etc_hosts] ******************************************************************************
-changed: [35.241.209.82]
-changed: [35.195.9.64]
-changed: [34.76.247.136]
-
-TASK [baremetal : Ensure sudo group is present] *************************************************************************************
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-
-TASK [baremetal : Ensure kolla group is present] ************************************************************************************
-changed: [35.241.209.82]
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-
-TASK [baremetal : Install apt packages] *********************************************************************************************
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-
-TASK [baremetal : Install ca certs] *************************************************************************************************
-ok: [35.241.209.82] => (item=ca-certificates)
-ok: [35.195.9.64] => (item=ca-certificates)
-ok: [34.76.247.136] => (item=ca-certificates)
-changed: [35.195.9.64] => (item=apt-transport-https)
-changed: [34.76.247.136] => (item=apt-transport-https)
-changed: [35.241.209.82] => (item=apt-transport-https)
-
-TASK [baremetal : Ensure apt sources list directory exists] *************************************************************************
-ok: [34.76.247.136]
-ok: [35.241.209.82]
-ok: [35.195.9.64]
-
-TASK [baremetal : Install docker apt gpg key] ***************************************************************************************
-changed: [34.76.247.136]
-changed: [35.241.209.82]
-changed: [35.195.9.64]
-
-TASK [baremetal : Enable docker apt repository] *************************************************************************************
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-
-TASK [baremetal : Ensure yum repos directory exists] ********************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Enable docker yum repository] *************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Ensure module_hotfixes enabled for docker] ************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Install docker rpm gpg key] ***************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : include_tasks] ****************************************************************************************************
-included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/install.yml for 35.241.209.82, 35.195.9.64, 34.76.247.136
-
-TASK [baremetal : Update apt cache] *************************************************************************************************
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-changed: [34.76.247.136]
-
-TASK [baremetal : Set firewall default policy] **************************************************************************************
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-
-TASK [baremetal : Check if firewalld is installed] **********************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Disable firewalld] ************************************************************************************************
-skipping: [35.241.209.82] => (item=firewalld) 
-skipping: [35.195.9.64] => (item=firewalld) 
-skipping: [34.76.247.136] => (item=firewalld) 
-
-TASK [baremetal : Check which containers are running] *******************************************************************************
-ok: [34.76.247.136]
-ok: [35.241.209.82]
-ok: [35.195.9.64]
-
-TASK [baremetal : Install apt packages] *********************************************************************************************
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-changed: [34.76.247.136]
-
-TASK [baremetal : Install deltarpm packages] ****************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Install RPM packages] *********************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Start docker] *****************************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Wait for Docker to start] *****************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Ensure containers are running after Docker upgrade] ***************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Install latest pip in the virtualenv] *****************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Install docker SDK for python] ************************************************************************************
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-
-TASK [baremetal : Remove packages] **************************************************************************************************
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-
-TASK [baremetal : Remove packages] **************************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : include_tasks] ****************************************************************************************************
-included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/post-install.yml for 35.241.209.82, 35.195.9.64, 34.76.247.136
-
-TASK [baremetal : Create kolla user] ************************************************************************************************
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-
-TASK [baremetal : Add public key to kolla user authorized keys] *********************************************************************
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-
-TASK [baremetal : Grant kolla user passwordless sudo] *******************************************************************************
-changed: [34.76.247.136]
-changed: [35.241.209.82]
-changed: [35.195.9.64]
-
-TASK [baremetal : Ensure virtualenv has correct ownership] **************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Ensure node_config_directory directory exists for user kolla] *****************************************************
-changed: [34.76.247.136]
-changed: [35.241.209.82]
-changed: [35.195.9.64]
-
-TASK [baremetal : Ensure node_config_directory directory exists] ********************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Ensure docker config directory exists] ****************************************************************************
-ok: [34.76.247.136]
-ok: [35.241.209.82]
-ok: [35.195.9.64]
-
-TASK [baremetal : Merge Zun docker config] ******************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Warn about deprecations] ******************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Setup docker insecure registries] *********************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Setup docker storage driver] **************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Setup docker runtime directory] ***********************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Merge custom docker config] ***************************************************************************************
-ok: [35.241.209.82]
-ok: [35.195.9.64]
-ok: [34.76.247.136]
-
-TASK [baremetal : Write docker config] **********************************************************************************************
-changed: [35.241.209.82]
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-
-TASK [baremetal : Remove old docker options file] ***********************************************************************************
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-ok: [34.76.247.136]
-
-TASK [baremetal : Ensure docker service directory exists] ***************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Configure docker service] *****************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Reload docker service file] ***************************************************************************************
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-
-TASK [baremetal : Get stat of libvirtd apparmor profile] ****************************************************************************
-ok: [34.76.247.136]
-ok: [35.241.209.82]
-ok: [35.195.9.64]
-
-TASK [baremetal : Remove apparmor profile for libvirt] ******************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Get stat of chronyd apparmor profile] *****************************************************************************
-ok: [35.195.9.64]
-ok: [34.76.247.136]
-ok: [35.241.209.82]
-
-TASK [baremetal : Remove apparmor profile for chrony] *******************************************************************************
-changed: [34.76.247.136]
-changed: [35.241.209.82]
-changed: [35.195.9.64]
-
-TASK [baremetal : Create docker group] **********************************************************************************************
-ok: [34.76.247.136]
-ok: [35.241.209.82]
-ok: [35.195.9.64]
-
-TASK [baremetal : Add kolla user to docker group] ***********************************************************************************
-changed: [35.241.209.82]
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-
-TASK [baremetal : Start docker] *****************************************************************************************************
-ok: [35.241.209.82]
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-
-TASK [baremetal : Restart docker] ***************************************************************************************************
-changed: [34.76.247.136]
-changed: [35.195.9.64]
-changed: [35.241.209.82]
-
-TASK [baremetal : Enable docker] ****************************************************************************************************
-ok: [34.76.247.136]
-ok: [35.195.9.64]
-ok: [35.241.209.82]
-
-TASK [baremetal : Stop time service] ************************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Stop time service] ************************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Synchronizing time one-time] **************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Start time sync service] ******************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Start time sync service] ******************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : Change state of selinux] ******************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-TASK [baremetal : include_tasks] ****************************************************************************************************
-skipping: [35.241.209.82]
-skipping: [35.195.9.64]
-skipping: [34.76.247.136]
-
-PLAY RECAP **************************************************************************************************************************
-34.76.247.136              : ok=41   changed=19   unreachable=0    failed=0    skipped=30   rescued=0    ignored=0   
-35.195.9.64                : ok=41   changed=19   unreachable=0    failed=0    skipped=30   rescued=0    ignored=0   
-35.241.209.82              : ok=41   changed=19   unreachable=0    failed=0    skipped=30   rescued=0    ignored=0   
+PLAY [Apply role baremetal] *****************************************************************************************************************
+
+TASK [baremetal : include_tasks] ************************************************************************************************************
+included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/bootstrap-servers.yml for 34.78.12.182, 35.195.29.29, 35.189.217.16
+
+TASK [baremetal : include_tasks] ************************************************************************************************************
+included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/pre-install.yml for 34.78.12.182, 35.195.29.29, 35.189.217.16
+
+TASK [baremetal : Ensure localhost in /etc/hosts] *******************************************************************************************
+ok: [35.189.217.16]
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+
+TASK [baremetal : Ensure hostname does not point to 127.0.1.1 in /etc/hosts] ****************************************************************
+ok: [35.195.29.29]
+ok: [35.189.217.16]
+ok: [34.78.12.182]
+
+TASK [baremetal : Generate /etc/hosts for all of the nodes] *********************************************************************************
+changed: [35.189.217.16]
+changed: [34.78.12.182]
+changed: [35.195.29.29]
+
+TASK [baremetal : Ensure /etc/cloud/cloud.cfg exists] ***************************************************************************************
+ok: [35.189.217.16]
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+
+TASK [baremetal : Disable cloud-init manage_etc_hosts] **************************************************************************************
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+changed: [35.189.217.16]
+
+TASK [baremetal : Ensure sudo group is present] *********************************************************************************************
+ok: [35.195.29.29]
+ok: [35.189.217.16]
+ok: [34.78.12.182]
+
+TASK [baremetal : Ensure kolla group is present] ********************************************************************************************
+changed: [35.189.217.16]
+changed: [34.78.12.182]
+changed: [35.195.29.29]
+
+TASK [baremetal : Install apt packages] *****************************************************************************************************
+changed: [35.189.217.16]
+changed: [34.78.12.182]
+changed: [35.195.29.29]
+
+TASK [baremetal : Install ca certs] *********************************************************************************************************
+ok: [35.189.217.16] => (item=ca-certificates)
+ok: [34.78.12.182] => (item=ca-certificates)
+ok: [35.195.29.29] => (item=ca-certificates)
+changed: [35.189.217.16] => (item=apt-transport-https)
+changed: [34.78.12.182] => (item=apt-transport-https)
+changed: [35.195.29.29] => (item=apt-transport-https)
+
+TASK [baremetal : Ensure apt sources list directory exists] *********************************************************************************
+ok: [35.189.217.16]
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+
+TASK [baremetal : Install docker apt gpg key] ***********************************************************************************************
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+
+TASK [baremetal : Enable docker apt repository] *********************************************************************************************
+changed: [35.189.217.16]
+changed: [34.78.12.182]
+changed: [35.195.29.29]
+
+TASK [baremetal : Ensure yum repos directory exists] ****************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Enable docker yum repository] *********************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Ensure module_hotfixes enabled for docker] ********************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Install docker rpm gpg key] ***********************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : include_tasks] ************************************************************************************************************
+included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/install.yml for 34.78.12.182, 35.195.29.29, 35.189.217.16
+
+TASK [baremetal : Update apt cache] *********************************************************************************************************
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+
+TASK [baremetal : Set firewall default policy] **********************************************************************************************
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+ok: [35.189.217.16]
+
+TASK [baremetal : Check if firewalld is installed] ******************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Disable firewalld] ********************************************************************************************************
+skipping: [34.78.12.182] => (item=firewalld) 
+skipping: [35.195.29.29] => (item=firewalld) 
+skipping: [35.189.217.16] => (item=firewalld) 
+
+TASK [baremetal : Check which containers are running] ***************************************************************************************
+ok: [35.189.217.16]
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+
+TASK [baremetal : Install apt packages] *****************************************************************************************************
+changed: [35.189.217.16]
+changed: [34.78.12.182]
+changed: [35.195.29.29]
+
+TASK [baremetal : Install deltarpm packages] ************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Install RPM packages] *****************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Start docker] *************************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Wait for Docker to start] *************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Ensure containers are running after Docker upgrade] ***********************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Install latest pip in the virtualenv] *************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Install docker SDK for python] ********************************************************************************************
+ok: [35.189.217.16]
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+
+TASK [baremetal : Remove packages] **********************************************************************************************************
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+
+TASK [baremetal : Remove packages] **********************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : include_tasks] ************************************************************************************************************
+included: /home/mludolph/.virtualenvs/base/share/kolla-ansible/ansible/roles/baremetal/tasks/post-install.yml for 34.78.12.182, 35.195.29.29, 35.189.217.16
+
+TASK [baremetal : Create kolla user] ********************************************************************************************************
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+
+TASK [baremetal : Add public key to kolla user authorized keys] *****************************************************************************
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+
+TASK [baremetal : Grant kolla user passwordless sudo] ***************************************************************************************
+changed: [34.78.12.182]
+changed: [35.195.29.29]
+changed: [35.189.217.16]
+
+TASK [baremetal : Ensure virtualenv has correct ownership] **********************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Ensure node_config_directory directory exists for user kolla] *************************************************************
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+changed: [35.189.217.16]
+
+TASK [baremetal : Ensure node_config_directory directory exists] ****************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Ensure docker config directory exists] ************************************************************************************
+ok: [35.195.29.29]
+ok: [35.189.217.16]
+ok: [34.78.12.182]
+
+TASK [baremetal : Merge Zun docker config] **************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Warn about deprecations] **************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Setup docker insecure registries] *****************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Setup docker storage driver] **********************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Setup docker runtime directory] *******************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Merge custom docker config] ***********************************************************************************************
+ok: [34.78.12.182]
+ok: [35.195.29.29]
+ok: [35.189.217.16]
+
+TASK [baremetal : Write docker config] ******************************************************************************************************
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+
+TASK [baremetal : Remove old docker options file] *******************************************************************************************
+ok: [35.189.217.16]
+ok: [34.78.12.182]
+ok: [35.195.29.29]
+
+TASK [baremetal : Ensure docker service directory exists] ***********************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Configure docker service] *************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Reload docker service file] ***********************************************************************************************
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+ok: [35.189.217.16]
+
+TASK [baremetal : Get stat of libvirtd apparmor profile] ************************************************************************************
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+ok: [35.189.217.16]
+
+TASK [baremetal : Remove apparmor profile for libvirt] **************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Get stat of chronyd apparmor profile] *************************************************************************************
+ok: [35.189.217.16]
+ok: [34.78.12.182]
+ok: [35.195.29.29]
+
+TASK [baremetal : Remove apparmor profile for chrony] ***************************************************************************************
+changed: [34.78.12.182]
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+
+TASK [baremetal : Create docker group] ******************************************************************************************************
+ok: [35.189.217.16]
+ok: [34.78.12.182]
+ok: [35.195.29.29]
+
+TASK [baremetal : Add kolla user to docker group] *******************************************************************************************
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+changed: [34.78.12.182]
+
+TASK [baremetal : Start docker] *************************************************************************************************************
+ok: [35.189.217.16]
+ok: [35.195.29.29]
+ok: [34.78.12.182]
+
+TASK [baremetal : Restart docker] ***********************************************************************************************************
+changed: [34.78.12.182]
+changed: [35.189.217.16]
+changed: [35.195.29.29]
+
+TASK [baremetal : Enable docker] ************************************************************************************************************
+ok: [35.189.217.16]
+ok: [34.78.12.182]
+ok: [35.195.29.29]
+
+TASK [baremetal : Stop time service] ********************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Stop time service] ********************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Synchronizing time one-time] **********************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Start time sync service] **************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Start time sync service] **************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : Change state of selinux] **************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+TASK [baremetal : include_tasks] ************************************************************************************************************
+skipping: [34.78.12.182]
+skipping: [35.195.29.29]
+skipping: [35.189.217.16]
+
+PLAY RECAP **********************************************************************************************************************************
+34.78.12.182               : ok=41   changed=19   unreachable=0    failed=0    skipped=30   rescued=0    ignored=0   
+35.189.217.16              : ok=41   changed=19   unreachable=0    failed=0    skipped=30   rescued=0    ignored=0   
+35.195.29.29               : ok=41   changed=19   unreachable=0    failed=0    skipped=30   rescued=0    ignored=0   
 localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 
