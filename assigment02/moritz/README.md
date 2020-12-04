@@ -237,7 +237,7 @@ ssh ubuntu@<FLOATING_IP> -i openstack_id_rsa
 
 ```
 
-### Making accessible from external
+### Making accessible from external (this does not work)
 
 ```sh
 CONTROLLER_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
