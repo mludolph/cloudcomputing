@@ -249,7 +249,9 @@ Computationally intensive applications or in-memory databases would benefit from
 Applications with a lot of mixed random and sequential disk access would benefit from running on AWS, since those speeds do not differ as much as on GCP. A simple database service (e.g. a users service for a social network), where you cannot make any assumptions about the pattern the data is accessed, would benefit from the random disk speed without needing high CPU performance.
 
 ## Plots
-!(cpu)[cpu-plot.png]
-!(mem)[mem-plot.png]
-!(diskRand)[diskRand-plot.png]
-!(diskSeq)[diskSeq-plot.png]
+
+![cpu](cpu-plot.png)
+![mem](mem-plot.png)
+![diskRand](diskRand-plot.png)
+![diskSeq](diskSeq-plot.png)
+
