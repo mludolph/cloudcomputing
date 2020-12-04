@@ -256,9 +256,17 @@ ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A POSTROUTING
 
 ## Exercise 4
 
-
-```
+```sh
 sudo apt-get update
 sudo apt-get install sysbench bc
 
+# copy benchmarking files
+# add crontab
 ```
+
+### Plots
+
+![cpu](deliverables/cpu-plot.png)
+![mem](deliverables/mem-plot.png)
+![diskRand](deliverables/diskRand-plot.png)
+![diskSeq](deliverables/diskSeq-plot.png)
