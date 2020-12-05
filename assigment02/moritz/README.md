@@ -75,17 +75,17 @@ gcloud compute firewall-rules create "cc-network2-fw1" \
         --target-tags="cc"\
         --source-ranges="10.2.0.0/16"
 
-# allow ssh and icmp from all address ranges (only to cc tagged machines)
+# allow ssh and icmp from all address ranges on first network (only to cc tagged machines)
 gcloud compute firewall-rules create "cc-network1-fw2"\
                               --network="cc-network1"\
                               --target-tags="cc"\
                               --allow=tcp:22,tcp:3389,icmp
-gcloud compute firewall-rules create "cc-network2-fw2"\
-                              --network="cc-network2"\
-                              --target-tags="cc"\
-                              --allow=tcp:22,tcp:3389,icmp
+#gcloud compute firewall-rules create "cc-network2-fw2"\
+#                              --network="cc-network2"\
+#                              --target-tags="cc"\
+#                              --allow=tcp:22,tcp:3389,icmp
 
-# allow all traffic for network1 (only to cc tagged machines)
+# allow all traffic for network1 (only to cc tagged machines) needed for openstack
 gcloud compute firewall-rules create "cc-network1-fw3"\
                                      --network="cc-network1"\
                                      --target-tags="cc"\
@@ -124,10 +124,10 @@ nc -z -v <VM2_INTERNAL_IP2> 22
 **Teardown**:
 
 ```sh
-gcloud compute disks delete "image-disk" --zone="europe-west1-b"
-gcloud compute instances delete controller --zone="europe-west1-b"
-gcloud compute instances delete compute1 --zone="europe-west1-b"
-gcloud compute instances delete compute2 --zone="europe-west1-b"
+gcloud compute disks delete "image-disk" --zone="europe-west1-b" -q
+gcloud compute instances delete controller --zone="europe-west1-b" -q
+gcloud compute instances delete compute1 --zone="europe-west1-b" -q
+gcloud compute instances delete compute2 --zone="europe-west1-b" -q
 ```
 
 ## Exercise 2
@@ -240,17 +240,72 @@ ssh ubuntu@<FLOATING_IP> -i openstack_id_rsa
 ### Making accessible from external (this does not work)
 
 ```sh
+# retrieve controller external ip
 CONTROLLER_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
 
-# specify alias ip range and floating ip range
-ALIAS_IP_RANGE=172.16.1.0/24
-FLOATING_IP_RANGE=10.122.0.0/24
+# floating ip of the nested vm
+FLOATING_IP=10.122.0.64
 
-# add netmapping of alias ip range to floating ip range
-# this allows addresses of kind 172.16.1.xxx be routed to 10.122.0.xxx
-# ip forwarding is enabled by default
-ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A PREROUTING -d $ALIAS_IP_RANGE -i ens4 -j NETMAP --to $FLOATING_IP_RANGE
-ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A POSTROUTING -s $FLOATING_IP_RANGE -j MASQUERADE
+# create a target instance to add additional static ips to router
+gcloud compute target-instances create ti-controller --instance="controller" --zone="europe-west1-b"
+
+# create an external ip from which the nested vm will be reachable
+gcloud compute addresses create ip-nvm1 --region=europe-west1
+# retrieve ip to variable
+NVM1_IP=$(gcloud compute addresses describe ip-nvm1 --region="europe-west1" --format='get(address)')
+
+# forward static ip to controller
+gcloud compute forwarding-rules create fw-ext-nvm1\
+                                --address $NVM1_IP\
+                                --target-instance="ti-controller"\
+                                --target-instance-zone="europe-west1-b"\
+                                --region="europe-west1"
+
+ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A PREROUTING -d $NVM1_IP -j DNAT --to-destination $FLOATING_IP
+
+
+
+# nested vm is now reachable e.g. using ping $nvm_ip
+
+```
+
+```sh
+
+# ALTERNATIVE
+gcloud compute instances create "router"\
+                                --zone="europe-west1-b"\
+                                --machine-type="n2-standard-2"\
+                                --image="nested-vm-image"\
+                                --tags="cc"\
+                                --network-interface subnet="cc-subnet1"
+
+CONTROLLER_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+ROUTER_EXTERNAL_IP=$(gcloud compute instances describe router --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
+
+FLOATING_IP_RANGE=10.122.0.0/24
+ALIAS_IP_RANGE=172.16.1.0/24
+
+ALIAS_IP_NVM1=172.16.1.64
+EXTERNAL_IP_NVM1=35.187.85.66
+
+# create a target instance to add additional static ips to router
+gcloud compute target-instances create ti-router --instance="router" --zone="europe-west1-b"
+
+# create an external ip from which the nested vm will be reachable
+gcloud compute addresses create ip-nvm1 --region=europe-west1
+# retrieve ip to variable
+NVM1_IP=$(gcloud compute addresses describe ip-nvm1 --region="europe-west1" --format='get(address)')
+
+# forward static ip to controller
+gcloud compute forwarding-rules create fw-ext-nvm1\
+                                --address $NVM1_IP\
+                                --target-instance="ti-router"\
+                                --target-instance-zone="europe-west1-b"\
+                                --region="europe-west1"
+
+ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A PREROUTING -d $ALIAS_IP_RANGE -j NETMAP --to $FLOATING_IP_RANGE
+ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa sudo iptables -t nat -A PREROUTING -d $FLOATING_IP_RANGE -j NETMAP --to $ALIAS_IP_RANGE
+
 
 ```
 

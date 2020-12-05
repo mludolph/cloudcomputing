@@ -35,12 +35,12 @@ docker exec openvswitch_vswitchd ip link set dev br-ex mtu 1400  # Ensure correc
 # add a route to the gcloud machine that routes all traffic of the floating ip range to the newly created bridge
 ip r a "$floating_subnet" via $floating_gateway dev br-ex
 
-# masquerade all IP packages going out of the network adapter ens4 with the internal ip of the controller VM
+# masquerade all IP packages going out of the network adapter ens4 with the ip of the controller VM
 iptables -t nat -A POSTROUTING -o ens4 -j MASQUERADE
 
-# Add a route to the firewall to forward all traffic coming from the ens4 nic (cc-network1) to the bridge
+# allow forwarding of traffic coming from the ens4 nic (cc-network1) to the bridge
 iptables -A FORWARD -i ens4 -o br-ex -j ACCEPT
-# and add a route to forward all traffic from the bridge nic (openstack vm network) to the (cc--network1)
+# and the same for the reverse direction
 iptables -A FORWARD -i br-ex -o ens4 -j ACCEPT
 ```
 

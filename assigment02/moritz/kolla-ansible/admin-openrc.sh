@@ -10,10 +10,10 @@
 # OpenStack API is version 3. For example, your cloud provider may implement
 # Image API v1.1, Block Storage API v2, and Compute API v2.0. OS_AUTH_URL is
 # only for the Identity API served through keystone.
-export OS_AUTH_URL=http://34.78.12.182:5000
+export OS_AUTH_URL=http://104.199.37.199:5000
 # With the addition of Keystone we have standardized on the term **project**
 # as the entity that owns the resources.
-export OS_PROJECT_ID=d1c0c35dba30489d8faca9cf5a369f2a
+export OS_PROJECT_ID=6a7eb6c31b1e48ada9fb7f089868b925
 export OS_PROJECT_NAME="admin"
 export OS_USER_DOMAIN_NAME="Default"
 if [ -z "$OS_USER_DOMAIN_NAME" ]; then unset OS_USER_DOMAIN_NAME; fi

@@ -5,14 +5,14 @@ ansible_become=True
 ansible_private_key_file=../id_rsa
 
 [control]
-34.78.12.182
+35.195.51.121
 
 [network:children]
 control
 
 [compute]
-35.195.29.29
-35.189.217.16
+35.205.122.72
+35.195.112.63
 
 [monitoring:children]
 control
