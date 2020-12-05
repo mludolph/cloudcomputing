@@ -270,3 +270,10 @@ sudo apt-get install sysbench bc
 ![mem](deliverables/mem-plot.png)
 ![diskRand](deliverables/diskRand-plot.png)
 ![diskSeq](deliverables/diskSeq-plot.png)
+
+### Questions
+
+The results of the CPU Benchmark test reveal that the nested Openstack VMs have a better performance than the GCP VM from the first assignment. This agrees with our expectations
+since the VM used in the first Benchmark test had the machine type e2-standard-2 which has a lower clock frequency than the n2-standard-2 on which the Openstack VMs are nested. 
+Also, the variance in the results with the second benchmark were less than in the first.
+
