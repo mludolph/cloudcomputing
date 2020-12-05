@@ -284,3 +284,8 @@ The memory in the Google Cloud VMs was better than on the Open Stack environment
 
 #### DiskRand
 The random disk access is basically the same for both the nested OpenStack benchmark and the benchmark from assigment 1. The nesting did not result in a performance drop in this case.
+
+
+#### DiskSeq
+
+The I/O test with sequential mode produced considerably worse results in the nested virtualization. We can see that in the previous assignment, our benchmark returned values ranging from 80 - 110MiB/s. On the nested virtaulization case, the range was from 40 - 70MiB/s. As the VM disk type on both cases on GCP are the same, this performance degradation can be attributed to the nested virtualization.
