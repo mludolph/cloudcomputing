@@ -9,10 +9,10 @@ Lastly, we configured our controller VM to be able to communicate with our newly
 
 ## 2. After creating all gc VMs, deploying OpenStack and starting an OpenStack VM, how many virtual networks are involved to establish the connectivity?
 
-- the 2 gcloud virtual networks
-- the openstack virtual network
+- the 2 gcloud virtual networks cc-network1 and cc-network2
+- the 2 openstack virtual networks (the admin-net and external)
 
-in total 3
+in total 4
 
 ## 3. Initially, the OpenStack VM was not reachable from the gc controller VM (step 11). Why?
 

@@ -325,3 +325,22 @@ sudo apt-get install sysbench bc
 ![mem](deliverables/mem-plot.png)
 ![diskRand](deliverables/diskRand-plot.png)
 ![diskSeq](deliverables/diskSeq-plot.png)
+
+### Questions
+
+#### CPU
+The results of the CPU Benchmark test reveal that the nested Openstack VMs have a better performance than the GCP VM from the first assignment. This agrees with our expectations
+since the VM used in the first benchmark test had the machine type e2-standard-2 which has a lower cpu speed than the n2-standard-2 on which the Openstack VMs are nested. 
+Also, the variance in the results with the second benchmark were less than in the first. Running the CPU benchmark on the n2-standard-2 machine itself resulted in a score of 1200, meaning that the nested VM has a slightly lower speed.
+
+#### Memory
+The memory in the Google Cloud VMs was better than on the Open Stack environment with an average difference memory performance of about 2100 MiB/s. This could either be because of the different machine types of the GCP VMs or due to the virtualization itself. Also the variance of the GCP environment is bigger than the variation on the Open Stack environment. Running the memory benchmark on the n2-standard-2 machine itself resulted in a score of 12000 MiB/s, meaning the OpenStack environment takes a big hit on the performance.
+
+
+#### DiskRand
+The random disk access is basically the same for both the nested OpenStack benchmark and the benchmark from assigment 1. The nesting did not result in a performance drop in this case.
+
+
+#### DiskSeq
+
+The I/O test with sequential mode produced considerably worse results in the nested virtualization. We can see that in the previous assignment, our benchmark returned values ranging from 80 - 110MiB/s. On the nested virtaulization case, the range was from 40 - 70MiB/s. As the VM disk type on both cases on GCP are the same, this performance degradation can be attributed to the nested virtualization.
