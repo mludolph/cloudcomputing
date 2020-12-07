@@ -1,19 +1,20 @@
 #!/bin/bash
 # create security group "open-all"
-
 openstack security group create open-all
+
 # add wide open rules for all tcp, udp and icmp traffic to the newly created security group
 # 1 command for each protocol
 openstack security group rule create --proto tcp --remote-ip 0.0.0.0/0 --dst-port 1:65525 open-all
 openstack security group rule create --proto udp --remote-ip 0.0.0.0/0 --dst-port 1:65525 open-all
 openstack security group rule create --proto icmp --remote-ip 0.0.0.0/0 open-all
 
-# create keypair for openstack
+# create keypair for openstack and export the private key to the file openstack_id_rsa
 openstack keypair create openstack_id_rsa > openstack_id_rsa
 # retrieve external ip for gcloud controller instance
 CONTROLLER_EXTERNAL_IP=$(gcloud compute instances describe controller --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone="europe-west1-b")
 
-# copy generated private key to gcloud controller instance and set permissions to 400
+# copy generated private key openstack_id_rsa to gcloud controller instance and set permissions to 400
+# using ssh and the gcloud ssh key id_rsa
 scp -i id_rsa openstack_id_rsa ccuser@$CONTROLLER_EXTERNAL_IP:/home/ccuser/openstack_id_rsa
 ssh ccuser@$CONTROLLER_EXTERNAL_IP -i id_rsa chmod 400 openstack_id_rsa
 

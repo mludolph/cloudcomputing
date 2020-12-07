@@ -1,15 +1,14 @@
-#!/bin/sh
 # create cc-network1 and cc-network2 with custom subnet mode
 gcloud compute networks create "cc-network1"\
                                --subnet-mode="custom"
 gcloud compute networks create "cc-network2"\
                                --subnet-mode="custom"
 
-# create cc-subnet1 for cc-network1 with subnet range 10.1.0.0/16 and secondary range 10.3.0.0/16
+# create cc-subnet1 for cc-network1 with subnet range 10.1.0.0/16 and secondary ip range 172.16.0.0/16
 gcloud compute networks subnets create "cc-subnet1"\
                                        --network="cc-network1"\
                                        --range="10.1.0.0/16"\
-                                       --secondary-range="secondary"="10.3.0.0/16"\
+                                       --secondary-range="vm-range"="172.16.0.0/20"\
                                        --region="europe-west1"
 
 # create cc-subnet2 for cc-network2 with subnet range 10.2.0.0/16
@@ -31,16 +30,19 @@ gcloud compute images create "nested-vm-image" \
                              --source-disk-zone="europe-west1-b"\
                              --licenses="https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx"
 
-# create controler vm instance as type n2-standard-2 using the nested-vm-image, cc tag, the two subnets and the secondary range in subnet1
+# create controler vm instance as type n2-standard-2 using the nested-vm-image, cc tag, 
+# the two subnets and the secondary range in subnet1 and an alias range
 gcloud compute instances create "controller"\
                                 --zone="europe-west1-b"\
                                 --machine-type="n2-standard-2"\
                                 --image="nested-vm-image"\
                                 --tags="cc"\
-                                --network-interface subnet="cc-subnet1",aliases="secondary":"10.3.0.0/16"\
-                                --network-interface subnet="cc-subnet2"
+                                --network-interface subnet="cc-subnet1",aliases="vm-range":"172.16.1.0/24"\
+                                --network-interface subnet="cc-subnet2"\
+                                --can-ip-forward
 
-# create compute1, compute2 vm instances as type n2-standard-2 using the nested-vm-image, cc tag and the two subnets
+# create compute1, compute2 vm instances as type n2-standard-2 using 
+# the nested-vm-image, cc tag and the two subnets
 gcloud compute instances create "compute1"\
                                 --zone="europe-west1-b"\
                                 --machine-type="n2-standard-2"\
@@ -56,29 +58,28 @@ gcloud compute instances create "compute2"\
                                 --network-interface subnet="cc-subnet1"\
                                 --network-interface subnet="cc-subnet2"
 
-# allow all internal traffic in vpcs (only to cc tagged machines)
+# allow all internal traffic in the first vpc (only to cc tagged machines)
 gcloud compute firewall-rules create "cc-network1-fw1" \
         --network="cc-network1"\
         --allow=tcp,udp,icmp\
         --target-tags="cc"\
         --source-ranges="10.1.0.0/16"
+
+# allow all internal traffic in the second vpc
 gcloud compute firewall-rules create "cc-network2-fw1" \
         --network="cc-network2"\
         --allow=tcp,udp,icmp\
         --target-tags="cc"\
         --source-ranges="10.2.0.0/16"
 
-# allow ssh and icmp from all address ranges (only to cc tagged machines)
+# allow ssh and icmp from all address ranges on first network (only to cc tagged machines)
+# in order to ssh into the machines (not really necessary since we open all ports with the next rule)
 gcloud compute firewall-rules create "cc-network1-fw2"\
                               --network="cc-network1"\
                               --target-tags="cc"\
                               --allow=tcp:22,tcp:3389,icmp
-gcloud compute firewall-rules create "cc-network2-fw2"\
-                              --network="cc-network2"\
-                              --target-tags="cc"\
-                              --allow=tcp:22,tcp:3389,icmp
 
-# allow all traffic for network1 (only to cc tagged machines)
+# allow all traffic for network1 (only to cc tagged machines) needed for openstack
 gcloud compute firewall-rules create "cc-network1-fw3"\
                                      --network="cc-network1"\
                                      --target-tags="cc"\
