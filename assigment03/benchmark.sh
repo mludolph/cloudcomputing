@@ -27,5 +27,7 @@ diskSeq=$(sysbench --time=$runtime --file-test-mode=seqrd --file-total-size=1G -
 1>&2 echo "Running fileio random read test..."
 diskRand=$(sysbench --time=$runtime --file-test-mode=rndrd --file-total-size=1G --file-num=1 --file-extra-flags=direct fileio run | grep "read, MiB" | awk '/ [0-9.]*$/{print $NF}')
 
+fork=$(2>/dev/null ~/forkbench 0 16384 | head -n 1)
+
 # Output the benchmark results as one CSV line
 echo "$time,$cpu,$mem,$diskRand,$diskSeq"
