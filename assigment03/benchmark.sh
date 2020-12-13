@@ -27,7 +27,21 @@ diskSeq=$(sysbench --time=$runtime --file-test-mode=seqrd --file-total-size=1G -
 1>&2 echo "Running fileio random read test..."
 diskRand=$(sysbench --time=$runtime --file-test-mode=rndrd --file-total-size=1G --file-num=1 --file-extra-flags=direct fileio run | grep "read, MiB" | awk '/ [0-9.]*$/{print $NF}')
 
-fork=$(2>/dev/null ~/forkbench 0 16384 | head -n 1)
+# Run forkbench until 60 seconds elapsed and calculate average forks per seccond using bc
+startTime=$(date +%s)
+elapsedTime=0
+count=0
+total=0
+while [ $elapsedTime -lt $runtime  ]
+do
+	fork=$(2>/dev/null ./forkbench 0 1024)
+    total=$(echo "$total+$fork" | bc)
+    currentTime=$(date +%s)
+    elapsedTime=$(($currentTime-$startTime))
+    count=$(($count+1))
+done
+
+fork=$(echo "scale=2;$total/$count" | bc)
 
 # Output the benchmark results as one CSV line
 echo "$time,$cpu,$mem,$diskRand,$diskSeq"

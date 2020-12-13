@@ -1,5 +1,26 @@
 # Assigment 3 solutions
 
+## Host ssetup
+
+### Specs
+
+- **OS**: Ubuntu 18.04
+- **CPU**: Intel Core i5 8600K 3.6GHz (6 cores)
+- **RAM**: 32GB DDR4 3200MHz
+- **Disk**: 256GB SATA SSD
+
+### Software versions
+
+```sh
+
+$ kvm --version
+> QEMU emulator version 2.12.0 (Debian 1:2.12+dfsg-0~18.04~ppa0)
+
+$ iperf3 --version
+iperf 3.7 (cJSON 1.5.2)
+```
+
+## Creating VMs
 
 ```sh
 # Download ubuntu cloud image
@@ -40,7 +61,7 @@ runcmd:
   - restart ssh
 EOF
 
-# Create cloudinit iso image 
+# Create cloudinit iso image
 
 sudo genisoimage  -output /var/lib/libvirt/images/instance1/instance1-cidata.iso -volid cidata -joliet -rock user-data meta-data
 
@@ -63,6 +84,21 @@ sudo virsh undefine instance1
 ```
 
 ```sh
-# copy forkbench to system and use make forkbench.c or
-gcc forkbench.c -o forkbench
+# copy forkbench to system and compile
+make forkbench.c
+```
+
+### iperf3 setup
+
+```sh
+sudo apt-get install iperf3
+
+```
+
+```sh
+iperf3 --server
+
+iperf3 --client localhost --time 10 --parallel 5 --version4
+
+
 ```
