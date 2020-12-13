@@ -1,3 +1,4 @@
+#!/bin/bash
 runtime=10
 
 startTime=$(date +%s)

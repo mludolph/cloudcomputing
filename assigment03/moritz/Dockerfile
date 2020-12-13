@@ -4,7 +4,7 @@ ADD forkbench.c /bench/forkbench.c
 ADD forkbench.sh /bench/forkbench.sh
 
 RUN apt-get -y update
-RUN apt-get -y install iperf3 bc build-essential
+RUN apt-get -y install iperf3 bc build-essential sysbench
 
 RUN chmod +x /bench/forkbench.sh
 
