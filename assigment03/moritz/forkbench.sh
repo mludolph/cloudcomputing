@@ -1,8 +1,10 @@
+runtime=10
+
 startTime=$(date +%s)
 elapsedTime=0
 count=0
 total=0
-while [ $elapsedTime -lt 5  ]
+while [ $elapsedTime -lt $runtime  ]
 do
 	fork=$(2>/dev/null ./forkbench 0 1024)
     total=$(echo "$total+$fork" | bc)
