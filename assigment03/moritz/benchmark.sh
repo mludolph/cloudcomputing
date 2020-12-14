@@ -34,7 +34,7 @@ count=0
 total=0
 while [ $elapsedTime -lt $runtime  ]
 do
-	fork=$(2>/dev/null ./forkbench 0 1024)
+	fork=$(2>/dev/null ./forkbench 0 4096)
     total=$(echo "$total+$fork" | bc)
     currentTime=$(date +%s)
     elapsedTime=$(($currentTime-$startTime))
