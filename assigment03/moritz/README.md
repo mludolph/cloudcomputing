@@ -59,6 +59,11 @@ users:
 runcmd:
   - echo "AllowUsers ubuntu" >> /etc/ssh/sshd_config
   - restart ssh
+packages:
+  - build-essential
+  - iperf3
+  - bc
+  - sysbench
 EOF
 
 # Create cloudinit iso image

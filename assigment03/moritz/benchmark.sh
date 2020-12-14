@@ -3,7 +3,7 @@
 # Some debug output is written to stderr, and the final benchmark result is output on stdout as a single CSV-formatted line.
 
 # Execute the sysbench tests for the given number of seconds
-runtime=60
+runtime=5
 
 # Record the Unix timestamp before starting the benchmarks.
 time=$(date +%s)
@@ -27,7 +27,7 @@ diskSeq=$(sysbench --time=$runtime --file-test-mode=seqrd --file-total-size=1G -
 1>&2 echo "Running fileio random read test..."
 diskRand=$(sysbench --time=$runtime --file-test-mode=rndrd --file-total-size=1G --file-num=1 --file-extra-flags=direct fileio run | grep "read, MiB" | awk '/ [0-9.]*$/{print $NF}')
 
-# Run forkbench until 60 seconds elapsed and calculate average forks per seccond using bc
+# Run forkbench until 60 seconds elapsed
 startTime=$(date +%s)
 elapsedTime=0
 count=0
@@ -41,7 +41,13 @@ do
     count=$(($count+1))
 done
 
+# calculate average forks per seccond using bc 
 fork=$(echo "scale=2;$total/$count" | bc)
 
+# connect to iperf3 server (specified by env variable) with the specified parameters (-f m: format in Mbit/s, 
+# -i 0 no intermediate results, -t $runtime: run for $runtime seconds, --parallel 5: use 5 connections, -4: use ipv4 only)
+# grep the SUM and then retrieve the Mbit/sec value for the sender throughput (first line in remaining output)
+uplink=$(iperf3 --client $IPERF3_HOST -f m -i 0 -t $runtime --parallel 5 -4 | grep '\[SUM\]' | awk 'NR==1{print $6; exit}')
+
 # Output the benchmark results as one CSV line
-echo "$time,$cpu,$mem,$diskRand,$diskSeq"
+echo "$time,$cpu,$mem,$diskRand,$diskSeq,$fork,$uplink"
