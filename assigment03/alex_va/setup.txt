@@ -1,0 +1,19 @@
+Host setup:
+------------------------------------
+------------------------------------
+
+Specs
+------------------------------------
+GCP n2-standard-2 VM
+OS: Ubuntu 18.04
+CPU: Intel Cascade Lake (2 vCPUs)
+RAM: 8GB
+Disk: 100GB
+
+Software versions
+------------------------------------
+KVM: 2.11.1
+virsh: 4.0.0
+iperf3: 3.1.3
+sysbench: 1.0.11
+bc: 1.07.1
