@@ -47,4 +47,3 @@ ssh ubuntu@$INSTANCE2_IP make forkbench && chmod +x benchmark.sh
 for i in {1..10}; do
     ssh ubuntu@$INSTANCE2_IP IPERF3_HOST=$IPERF3_HOST 2>/dev/null bash benchmark.sh  >> "qemu-results.csv"
 done
-
