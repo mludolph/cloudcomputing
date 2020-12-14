@@ -3,7 +3,7 @@
 # Some debug output is written to stderr, and the final benchmark result is output on stdout as a single CSV-formatted line.
 
 # Execute the sysbench tests for the given number of seconds
-runtime=5
+runtime=60
 
 # Record the Unix timestamp before starting the benchmarks.
 time=$(date +%s)
