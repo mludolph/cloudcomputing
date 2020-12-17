@@ -1,1 +1,1 @@
-docker image build . -t docker-bench
+docker image build ./deliverables -t docker-bench
