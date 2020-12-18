@@ -142,3 +142,12 @@ virsh --connect qemu:///system shutdown instance2
 virsh --connect qemu:///system undefine instance1
 virsh --connect qemu:///system undefine instance2
 ```
+
+
+# Question answers
+## CPU
+Qemu without hardware support emulates the CPU in software which results in a great loss in performance compared to the others. When the KVM is used as an accelerator for QEMU the physical CPU virtualization extensions can be used. This leads to identical performance compared to native System. The Docker containers performance is also similar to the native system due to the unlimited access to the hosts CPU. 
+
+## diskRand
+In KVM the default cache mode is writeback. In this mode O_DSYNC, which makes every write() to the file return only when the contents of the file have been written to disk, is disabled. This means the host page cache is used and writes are reported to the guest as completed when placed in the host page cache. This results in a better performance but depending on the hardware it can lead to a data loss in a power outage.
+
