@@ -151,3 +151,5 @@ Qemu without hardware support emulates the CPU in software which results in a gr
 ## diskRand
 In KVM the default cache mode is writeback. In this mode O_DSYNC, which makes every write() to the file return only when the contents of the file have been written to disk, is disabled. This means the host page cache is used and writes are reported to the guest as completed when placed in the host page cache. This results in a better performance but depending on the hardware it can lead to a data loss in a power outage.
 
+## diskSeq
+This result underpins what has been seen in the previous plots of this assignment. The KVM has the best performance which can be attributed to the writeback caching. The performance of Docker and QEMU was worse compared to the nativ system due to the additional latency of the docker daemon.
