@@ -126,9 +126,9 @@ VCPUS=$(nproc)
 MEMORY=4096
 
 # Create instance
-virt-install --connect qemu:///system --virt-type kvm --name instance1 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance1/instance1.qcow2,format=qcow2 --disk /var/lib/libvirt/images/instance1/instance1-cidata.iso,device=cdrom --import --network network=default --noautoconsole
+virt-install --connect qemu:///system --virt-type kvm --name instance1 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance1/instance1.qcow2,format=qcow2,cache=none --disk /var/lib/libvirt/images/instance1/instance1-cidata.iso,device=cdrom --import --network network=default --noautoconsole
 
-virt-install --connect qemu:///system --virt-type qemu --name instance2 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance2/instance2.qcow2,format=qcow2 --disk /var/lib/libvirt/images/instance2/instance2-cidata.iso,device=cdrom --import --network network=default --noautoconsole
+virt-install --connect qemu:///system --virt-type qemu --name instance2 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance2/instance2.qcow2,format=qcow2,cache=none --disk /var/lib/libvirt/images/instance2/instance2-cidata.iso,device=cdrom --import --network network=default --noautoconsole
 
 virsh --connect qemu:///system list
 virsh --connect qemu:///system domifaddr instance1

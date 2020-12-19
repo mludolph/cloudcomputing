@@ -1,0 +1,29 @@
+Host System:
+
+- OS: Ubuntu 18.04
+- CPU: Intel Core i5 8600K 3.6GHz (6 cores)
+- RAM: 32GB DDR4 3200MHz
+- Disk: 256GB SATA SSD
+
+Software Versions:
+
+$ kvm --version
+> QEMU emulator version 2.12.0 (Debian 1:2.12+dfsg-0~18.04~ppa0)
+
+$ virsh --version
+> 4.7.0
+
+$ iperf3 --version
+> iperf 3.7 (cJSON 1.5.2)
+
+$ sysbench --version
+> sysbench 1.0.11
+
+$ bc --version
+> bc 1.07.1
+
+VM setups:
+- Image: Ubuntu 18.04 cloud image / resized to 15GB
+- CPU: same as Host
+- RAM: 4GB
+- default virsh settings when creating the vms
