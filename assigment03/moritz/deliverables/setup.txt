@@ -26,4 +26,4 @@ VM setups:
 - Image: Ubuntu 18.04 cloud image / resized to 15GB
 - CPU: same as Host
 - RAM: 4GB
-- default virsh settings when creating the vms
+- cache=none for disk images
