@@ -126,9 +126,9 @@ VCPUS=$(nproc)
 MEMORY=4096
 
 # Create instance
-virt-install --connect qemu:///system --virt-type kvm --name instance1 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance1/instance1.qcow2,format=qcow2 --disk /var/lib/libvirt/images/instance1/instance1-cidata.iso,device=cdrom --import --network network=default --noautoconsole
+virt-install --connect qemu:///system --virt-type kvm --name instance1 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance1/instance1.qcow2,format=qcow2,cache=none --disk /var/lib/libvirt/images/instance1/instance1-cidata.iso,device=cdrom --import --network network=default --noautoconsole
 
-virt-install --connect qemu:///system --virt-type qemu --name instance2 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance2/instance2.qcow2,format=qcow2 --disk /var/lib/libvirt/images/instance2/instance2-cidata.iso,device=cdrom --import --network network=default --noautoconsole
+virt-install --connect qemu:///system --virt-type qemu --name instance2 --ram $MEMORY --vcpus=$VCPUS --os-type linux --os-variant ubuntu18.04 --disk path=/var/lib/libvirt/images/instance2/instance2.qcow2,format=qcow2,cache=none --disk /var/lib/libvirt/images/instance2/instance2-cidata.iso,device=cdrom --import --network network=default --noautoconsole
 
 virsh --connect qemu:///system list
 virsh --connect qemu:///system domifaddr instance1
@@ -143,13 +143,16 @@ virsh --connect qemu:///system undefine instance1
 virsh --connect qemu:///system undefine instance2
 ```
 
-
 # Question answers
+
 ## CPU
-Qemu without hardware support emulates the CPU in software which results in a great loss in performance compared to the others. When the KVM is used as an accelerator for QEMU the physical CPU virtualization extensions can be used. This leads to identical performance compared to native System. The Docker containers performance is also similar to the native system due to the unlimited access to the hosts CPU. 
+
+Qemu without hardware support emulates the CPU in software which results in a great loss in performance compared to the others. When the KVM is used as an accelerator for QEMU the physical CPU virtualization extensions can be used. This leads to identical performance compared to native System. The Docker containers performance is also similar to the native system due to the unlimited access to the hosts CPU.
 
 ## diskRand
+
 In KVM the default cache mode is writeback. In this mode O_DSYNC, which makes every write() to the file return only when the contents of the file have been written to disk, is disabled. This means the host page cache is used and writes are reported to the guest as completed when placed in the host page cache. This results in a better performance but depending on the hardware it can lead to a data loss in a power outage.
 
 ## diskSeq
+
 This result underpins what has been seen in the previous plots of this assignment. The KVM has the best performance which can be attributed to the writeback caching. The performance of Docker and QEMU was worse compared to the nativ system due to the additional latency of the docker daemon.
