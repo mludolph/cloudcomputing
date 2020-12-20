@@ -28,8 +28,7 @@ The caching we observed in the random disk access benchmark for docker did not h
 
 ## Fork
 
-The fork benchmark slightly differs from the previous results, since the KVM VM reached a better performance than the docker container where both are slightly worse than the native machine.
-This could be due to the fact that docker uses the hosts OS kernel.
+For the fork benchmark both KVM and Docker slightly degrade the performance in comparison to the native benchmark, which can again be attributed to the additional CPU overhead created by the docker runtime and virtualization for KVM.
 As before, we observe the lowest performance when using QEMU without KVM which again can be attributed to the emulation without hardware-acceleration.
 
 ## Uplink
