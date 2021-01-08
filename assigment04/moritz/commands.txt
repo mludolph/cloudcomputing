@@ -1,0 +1,27 @@
+# build docker images from respective Dockerfiles, context of local directory and tag them
+docker build -f frontend.Dockerfile -t mludolph/images:ccfrontend .
+docker build -f backend.Dockerfile -t mludolph/images:ccbackend .
+
+# login to dockerhub to push images to repository
+docker login
+
+# push the images to the public dockerhub repository
+docker push mludolph/images:ccfrontend
+docker push mludolph/images:ccbackend
+
+# run ansible-playbook from local machine
+ansible-playbook -i hosts.yml webapp.yml
+
+# get node port by running the following 2 lines from the node1, i.e. ssh into node1 e.g. using ssh ubuntu@$node1_ip
+node_port=$(kubectl get svc cc-frontend-service -n cc -o=jsonpath='{.spec.ports[?(@.port==80)].nodePort}')
+echo $node_port
+
+
+# create variables with the nodeport from the stop above and the ips of the 3 nodes
+node_port=30339
+node1_ip=192.168.122.80
+node2_ip=192.168.122.113
+node3_ip=192.168.122.168
+
+# run the python script and redirect the output to the test-outpu.txt
+python3 test-deployment.py $node1_ip:$node_port $node2_ip:$node_port $node3_ip:$node_port > test-output.txt

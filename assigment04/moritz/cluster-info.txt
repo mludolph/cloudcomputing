@@ -1,0 +1,7 @@
+Kubernetes master is running at https://192.168.122.80:6443
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+NAME    STATUS   ROLES    AGE   VERSION
+node1   Ready    master   36m   v1.18.10
+node2   Ready    master   36m   v1.18.10
+node3   Ready    master   36m   v1.18.10
