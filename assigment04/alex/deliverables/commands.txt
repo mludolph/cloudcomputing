@@ -1,0 +1,11 @@
+
+
+sudo docker build -f frontend.Dockerfile -t alevator/images:ccfrontend .
+
+sudo docker build -f backend.Dockerfile -t alevator/images:backend .
+
+
+#push images
+
+sudo docker push alevator/images:ccfrontend
+sudo docker push alevator/images:ccbackend

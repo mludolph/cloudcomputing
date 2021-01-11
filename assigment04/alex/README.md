@@ -137,3 +137,9 @@ declare -a IPS=($VM1_EXTERNAL_IP $VM2_EXTERNAL_IP $VM3_EXTERNAL_IP)
 CONFIG_FILE=inventory/mycluster/hosts.yml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
 ```
 
+To run the Kubespray playbook:
+
+```bash
+ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml
+```
+
