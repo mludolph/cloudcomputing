@@ -92,8 +92,7 @@ VM3_INTERNAL_IP2=$(gcloud compute instances describe worker2 --format='get(netwo
 Afterwards, connect to each and run
 
 ```bash
-sudo apt update && sudo apt upgrade
-sudo apt install python-pip
+sudo apt update && sudo apt upgrade -y && sudo apt install python-pip -y
 ```
 
 In case access to default root user "ubuntu" is needed, run this to reset password:
@@ -142,4 +141,63 @@ To run the Kubespray playbook:
 ```bash
 ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml
 ```
+2. Prepare Docker images
 
+First of all, sign up on Docker repos and create a repo. All commands are included in the *commands.txt* that is in the deliverables.
+
+3. Deploy application
+
+Before executing the playbook, make sure you have this.
+
+```bash
+ansible-galaxy collection install community.kubernetes
+```
+
+(it's dangerous to go alone, take community.kubernetes with you)
+
+command to run the playbook is in the same fashion as before.
+
+```bash
+ansible-playbook -i inventory/mycluster/hosts.yml webapp.yml
+```
+
+After this finishes successfully, SSH to node1 to continue.
+
+Tip: change the default namespace to the one used in the playbook. In this case, cc.
+
+```bash
+kubectl config set-context --current --namespace cc
+
+# to get the service info:
+kubectl get svc
+```
+
+node_port=30414
+VM1_EXTERNAL_IP=34.77.26.213
+VM2_EXTERNAL_IP=146.148.23.178
+VM3_EXTERNAL_IP=146.148.21.54
+
+```bash
+# this does not work, but it's how the command should look like
+python3 test-deployment.py $VM1_EXTERNAL_IP:$node_port $VM2_EXTERNAL_IP:$node_port $VM3_EXTERNAL_IP:$node_port > test-output.txt
+```
+
+
+Other useful stuff
+```bash
+
+# force deleting stuff
+kubectl delete pod --all --grace-period=0 --force 
+
+# get all pods
+kubectl get pods
+
+# logging
+kubectl logs pod_name_here
+
+# events 
+kubectl get events --sort-by=.metadata.creationTimestamp
+update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+```
+
+[Nice cheat sheet here](https://kubernetes.io/docs/reference/kubectl/cheatsheet/#kubectl-context-and-configuration)
