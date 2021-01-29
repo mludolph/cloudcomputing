@@ -64,6 +64,11 @@ ssh ubuntu@$node1_ip "java -version"
 ssh ubuntu@$node2_ip "java -version"
 ssh ubuntu@$node3_ip "java -version"
 
+# configure JAVA_HOME environment variable
+ssh ubuntu@$node1_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node2_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node3_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+
 
 #######################
 # Hadoop Installation #
@@ -74,28 +79,25 @@ ssh ubuntu@$node1_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoo
 ssh ubuntu@$node2_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
 ssh ubuntu@$node3_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
 
-# set hadoop java environment
+# manually set hadoop java environment (just to be sure)
 ssh ubuntu@$node1_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
 ssh ubuntu@$node2_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
 ssh ubuntu@$node3_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
 
-# move hadoop to /usr/local/hadoop
+# move hadoop out of the home directory
 ssh ubuntu@$node1_ip "sudo mv hadoop /usr/local/hadoop"
 ssh ubuntu@$node2_ip "sudo mv hadoop /usr/local/hadoop"
 ssh ubuntu@$node3_ip "sudo mv hadoop /usr/local/hadoop"
 
-# configure PATH and JAVA_HOME environment variables
+# add hadoop binaries to PATH environment variable
 ssh ubuntu@$node1_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
 ssh ubuntu@$node2_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
 ssh ubuntu@$node3_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
-ssh ubuntu@$node1_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
-ssh ubuntu@$node2_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
-ssh ubuntu@$node3_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
 
 # create directory to put all configuration files into (on local machine)
 mkdir hadoopconf
 
-# create 
+# create the core hadoop configuration file
 cat > hadoopconf/core-site.xml <<EOF
 <configuration>
 <property>
