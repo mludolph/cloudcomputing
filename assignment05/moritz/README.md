@@ -32,9 +32,7 @@ mv flink-1.12.1 flink
 ./flink/bin/flink run WordCount.jar --input tolstoy-war-and-peace.txt --output WordCountResults.txt
 ```
 
-
-## Exercise 2 (THIS TIME USING QEMU VMS MUHAR) :rocket: :rocket:
-
+## Exercise 2 (THIS TIME USING QEMU VMS MUHAR) :rocket: :rocket: :rocket:
 
 ```bash
 #################
@@ -143,36 +141,37 @@ ssh ubuntu@$node1_ip start-dfs.sh
 # Flink installation #
 ######################
 
-# download flink, unzip and move to rename the directory (for brevity) on each node
+# download flink, unzip and rename the directory (for brevity) on each node
 ssh ubuntu@$node1_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
 ssh ubuntu@$node2_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
 ssh ubuntu@$node3_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
 
-# add the configuration key for the master node to configuration on each node
+# set the jobmanager host to the masternode (node1) in the config file on each node
 ssh ubuntu@$node1_ip 'echo "jobmanager.rpc.address: node1" >> flink/conf/flink-conf.yaml'
 ssh ubuntu@$node2_ip 'echo "jobmanager.rpc.address: node1" >> flink/conf/flink-conf.yaml'
 ssh ubuntu@$node3_ip 'echo "jobmanager.rpc.address: node1" >> flink/conf/flink-conf.yaml'
 
-# add the hadoop configuration directory to the config for each node
+# set the hadoop configuration directory in the config file on each node
 ssh ubuntu@$node1_ip 'echo "env.hadoop.conf.dir: /usr/local/hadoop/etc/hadoop" >> flink/conf/flink-conf.yaml'
 ssh ubuntu@$node2_ip 'echo "env.hadoop.conf.dir: /usr/local/hadoop/etc/hadoop" >> flink/conf/flink-conf.yaml'
 ssh ubuntu@$node3_ip 'echo "env.hadoop.conf.dir: /usr/local/hadoop/etc/hadoop" >> flink/conf/flink-conf.yaml'
 
+# move flink directory out of our home directory
 ssh ubuntu@$node1_ip 'sudo mv flink /usr/local/flink'
 ssh ubuntu@$node2_ip 'sudo mv flink /usr/local/flink'
 ssh ubuntu@$node3_ip 'sudo mv flink /usr/local/flink'
 
-# add required environment variables
+# add required environment variables in order for flink to be able to access hdfs
 ssh ubuntu@$node1_ip 'echo "HADOOP_CLASSPATH=$(hadoop classpath)" | sudo tee -a /etc/environment'
 ssh ubuntu@$node2_ip 'echo "HADOOP_CLASSPATH=$(hadoop classpath)" | sudo tee -a /etc/environment'
 ssh ubuntu@$node3_ip 'echo "HADOOP_CLASSPATH=$(hadoop classpath)" | sudo tee -a /etc/environment'
 
-# add flink to path variable
+# add flink binaries to path variable
 ssh ubuntu@$node1_ip 'echo "PATH="/usr/local/flink/bin:$PATH"" | sudo tee -a /etc/environment'
 ssh ubuntu@$node2_ip 'echo "PATH="/usr/local/flink/bin:$PATH"" | sudo tee -a /etc/environment'
 ssh ubuntu@$node3_ip 'echo "PATH="/usr/local/flink/bin:$PATH"" | sudo tee -a /etc/environment'
 
-# create configuration for flink masters & workers
+# create configuration files for flink masters & workers
 mkdir flinkconf
 cat > flinkconf/master <<EOF
 node1
@@ -184,7 +183,7 @@ node2
 node3
 EOF
 
-# copy worker/master configuration to all nodes
+# copy the configuration files to all nodes
 scp flinkconf/* ubuntu@$node1_ip:/usr/local/flink/conf
 scp flinkconf/* ubuntu@$node2_ip:/usr/local/flink/conf
 scp flinkconf/* ubuntu@$node3_ip:/usr/local/flink/conf
