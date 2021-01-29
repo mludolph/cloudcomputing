@@ -79,7 +79,7 @@ ssh ubuntu@$node3_ip "java -version"
 # Hadoop Installation #
 #######################
 
-# download, unpack and move hadoop on all nodes
+# download, unpack and rename the directory (for brevity) on all nodes
 ssh ubuntu@$node1_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
 ssh ubuntu@$node2_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
 ssh ubuntu@$node3_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
@@ -148,6 +148,7 @@ ssh ubuntu@$node1_ip start-dfs.sh
 # Flink installation #
 ######################
 
+# download flink, unzip and move to rename the directory (for brevity) on each node
 ssh ubuntu@$node1_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
 ssh ubuntu@$node2_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
 ssh ubuntu@$node3_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
