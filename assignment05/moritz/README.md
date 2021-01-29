@@ -33,7 +33,7 @@ mv flink-1.12.1 flink
 ```
 
 
-## Exercise 2 (THIS TIME USING QEMU VMS MUHAR)
+## Exercise 2 (THIS TIME USING QEMU VMS MUHAR) :rocket: :rocket:
 
 
 ```bash
