@@ -6,7 +6,7 @@
 
 #### Project intialization (not needed after first setup)
 
-```sh
+```bash
 mvn archetype:generate                             \
   -DarchetypeGroupId=org.apache.flink              \
   -DarchetypeArtifactId=flink-quickstart-java      \
@@ -15,14 +15,14 @@ mvn archetype:generate                             \
 
 #### Build JAR
 
-```sh
+```bash
 mvn -f WordCount/pom.xml clean package
 cp WordCount/target/WordCount-1.0.jar WordCount.jar
 ```
 
 ### Run flink locally
 
-```sh
+```bash
 wget https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz
 tar -xzf flink-1.12.1-bin-scala_2.12.tgz
 rm flink-1.12.1-bin-scala_2.12.tgz
@@ -57,9 +57,9 @@ scp id_rsa* ubuntu@$node2_ip:~/.ssh/
 scp id_rsa* ubuntu@$node3_ip:~/.ssh/
 
 # install java on all nodes
-ssh ubuntu@$node1_ip "sudo apt-get update & sudo apt-get -y install openjdk-8-jdk"
-ssh ubuntu@$node2_ip "sudo apt-get update & sudo apt-get -y install openjdk-8-jdk"
-ssh ubuntu@$node3_ip "sudo apt-get update & sudo apt-get -y install openjdk-8-jdk"
+ssh ubuntu@$node1_ip "sudo apt-get update && sudo apt-get -y install openjdk-8-jdk"
+ssh ubuntu@$node2_ip "sudo apt-get update && sudo apt-get -y install openjdk-8-jdk"
+ssh ubuntu@$node3_ip "sudo apt-get update && sudo apt-get -y install openjdk-8-jdk"
 
 # OPTIONAL: test java installation
 ssh ubuntu@$node1_ip "java -version"
