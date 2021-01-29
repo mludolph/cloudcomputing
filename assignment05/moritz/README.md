@@ -193,8 +193,15 @@ ssh ubuntu@$node1_ip start-cluster.sh
 ### Run WordCount example on Cluster
 
 ```bash
+# copy jar and input file to master node
 scp {WordCount.jar,tolstoy-war-and-peace.txt} ubuntu@$node1_ip:~
+
+# put input file to hdfs
 hdfs dfs -put tolstoy-war-and-peace.txt /
 
-flink run WordCount.jar --input "hdfs://node1:9000/tolstoy-war-and-peace.txt" --output "hdfs://node1:9000/output.txt"
+# run WordCount on cluster
+flink run WordCount.jar --input "hdfs://node1:9000/tolstoy-war-and-peace.txt" --output "hdfs://node1:9000/WordCountResults.txt"
+
+# get output from hdfs
+hdfs dfs -get WordCountResults.txt
 ```
