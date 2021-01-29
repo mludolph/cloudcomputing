@@ -94,9 +94,10 @@ ssh ubuntu@$node1_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sud
 ssh ubuntu@$node2_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
 ssh ubuntu@$node3_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
 
-
+# create directory to put all configuration files into (on local machine)
 mkdir hadoopconf
-# create hadoop config files on local machine
+
+# create 
 cat > hadoopconf/core-site.xml <<EOF
 <configuration>
 <property>
@@ -106,6 +107,7 @@ cat > hadoopconf/core-site.xml <<EOF
 </configuration>
 EOF
 
+# configure hdfs properties
 cat > hadoopconf/hdfs-site.xml <<EOF
 <configuration>
 <property>
@@ -121,6 +123,7 @@ cat > hadoopconf/hdfs-site.xml <<EOF
 </configuration>
 EOF
 
+# configure worker nodes (all in this case)
 cat > hadoopconf/workers <<EOF
 node1
 node2
