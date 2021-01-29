@@ -91,6 +91,9 @@ kubectl create -f jobmanager-service.yaml
 # Create the deployments for the cluster
 kubectl create -f jobmanager-session-deployment.yaml
 kubectl create -f taskmanager-session-deployment.yaml
+
+# since new versions of 
+
 ```
 
 ### Start Flink job

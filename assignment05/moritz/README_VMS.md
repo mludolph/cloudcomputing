@@ -1,12 +1,24 @@
-
-
 ## Exercise 2: VM clusters
 
 ```bash
-# Get IP addresses of all nodes (QEMU VMs in this case)
+# get IP addresses of all nodes (QEMU VMs in this case)
 node1_ip=$(virsh --connect qemu:///system domifaddr instance1 | awk 'NR==3{print $4; exit}' | grep -o '^[^/]*')
 node2_ip=$(virsh --connect qemu:///system domifaddr instance2 | awk 'NR==3{print $4; exit}' | grep -o '^[^/]*')
 node3_ip=$(virsh --connect qemu:///system domifaddr instance3 | awk 'NR==3{print $4; exit}' | grep -o '^[^/]*')
+
+# generate an SSH key and exchange key between nodes so that nodes can SSH to eachother
+ssh-keygen -q -t rsa -N '' -f ./id_rsa
+ssh-copy-id -i id_rsa ubuntu@$node1_ip
+ssh-copy-id -i id_rsa ubuntu@$node2_ip
+ssh-copy-id -i id_rsa ubuntu@$node3_ip
+scp id_rsa* ubuntu@$node1_ip:~/.ssh/
+scp id_rsa* ubuntu@$node2_ip:~/.ssh/
+scp id_rsa* ubuntu@$node3_ip:~/.ssh/
+
+#######################
+# Hadoop Installation #
+#######################
+
 
 # install java on all nodes
 ssh ubuntu@$node1_ip "sudo apt-get update & sudo apt-get -y install openjdk-8-jdk"
@@ -24,32 +36,67 @@ ssh ubuntu@$node2_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoo
 ssh ubuntu@$node3_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
 
 # set hadoop java environment
-ssh ubuntu@$node1_ip "echo \"export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64\" >> ~/hadoop/etc/hadoop/hadoop-env.sh"
-ssh ubuntu@$node2_ip "echo \"export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64\" >> ~/hadoop/etc/hadoop/hadoop-env.sh"
-ssh ubuntu@$node3_ip "echo \"export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64\" >> ~/hadoop/etc/hadoop/hadoop-env.sh"
+ssh ubuntu@$node1_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
+ssh ubuntu@$node2_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
+ssh ubuntu@$node3_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
 
 # move hadoop to /usr/local/hadoop
 ssh ubuntu@$node1_ip "sudo mv hadoop /usr/local/hadoop"
 ssh ubuntu@$node2_ip "sudo mv hadoop /usr/local/hadoop"
 ssh ubuntu@$node3_ip "sudo mv hadoop /usr/local/hadoop"
 
+# configure PATH and JAVA_HOME environment variables
+ssh ubuntu@$node1_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node2_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node3_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node1_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node2_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node3_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
 
-# add hadoop dns to all nodes
-ssh ubuntu@$node1_ip "echo \"${node1_ip}    hadoop-master\" | sudo tee -a /etc/hosts && 
-                      echo \"${node2_ip}    hadoop-slave1\" | sudo tee -a /etc/hosts &&
-                      echo \"${node3_ip}    hadoop-slave2\" | sudo tee -a /etc/hosts"
 
-ssh ubuntu@$node2_ip "echo \"${node1_ip}    hadoop-master\" | sudo tee -a /etc/hosts && 
-                      echo \"${node2_ip}    hadoop-slave1\" | sudo tee -a /etc/hosts &&
-                      echo \"${node3_ip}    hadoop-slave2\" | sudo tee -a /etc/hosts"
+mkdir hadoopconf
+# create hadoop config files on local machine
+cat > hadoopconf/core-site.xml <<EOF
+<configuration>
+<property>
+<name>fs.defaultFS</name>
+<value>hdfs://node1:9000</value>
+</property>
+</configuration>
+EOF
 
-ssh ubuntu@$node3_ip "echo \"${node1_ip}    hadoop-master\" | sudo tee -a /etc/hosts && 
-                      echo \"${node2_ip}    hadoop-slave1\" | sudo tee -a /etc/hosts &&
-                      echo \"${node3_ip}    hadoop-slave2\" | sudo tee -a /etc/hosts"
+cat > hadoopconf/hdfs-site.xml <<EOF
+<configuration>
+<property>
+<name>dfs.namenode.name.dir</name><value>/usr/local/hadoop/data/nameNode</value>
+</property>
+<property>
+<name>dfs.datanode.data.dir</name><value>/usr/local/hadoop/data/dataNode</value>
+</property>
+<property>
+<name>dfs.replication</name>
+<value>2</value>
+</property>
+</configuration>
+EOF
 
-# generate key on master and copy to all nodes
-ssh ubuntu@$node1_ip "ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa"
-ssh ubuntu@$node1_ip "ssh-copy-id ubuntu@hadoop-master"
-ssh ubuntu@$node1_ip "ssh-copy-id ubuntu@hadoop-slave1"
-ssh ubuntu@$node1_ip "ssh-copy-id ubuntu@hadoop-slave2"
+cat > hadoopconf/workers <<EOF
+node2
+node3
+EOF
+
+# copy config files to all cluster nodes
+scp hadoopconf/* ubuntu@$node1_ip:/usr/local/hadoop/etc/hadoop/
+scp hadoopconf/* ubuntu@$node2_ip:/usr/local/hadoop/etc/hadoop/
+scp hadoopconf/* ubuntu@$node3_ip:/usr/local/hadoop/etc/hadoop/
+
+# format hdfs and startup
+ssh ubuntu@$node1_ip hdfs namenode -format
+ssh ubuntu@$node1_ip start-dfs.sh
+
+######################
+# Flink installation #
+######################
+
+
 ```
