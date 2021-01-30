@@ -1,0 +1,158 @@
+#################
+# Prerequisites #
+################# 
+ 
+# get IP addresses of all nodes (QEMU VMs in this case)
+node1_ip=$(virsh --connect qemu:///system domifaddr instance1 | awk 'NR==3{print $4; exit}' | grep -o '^[^/]*')
+node2_ip=$(virsh --connect qemu:///system domifaddr instance2 | awk 'NR==3{print $4; exit}' | grep -o '^[^/]*')
+node3_ip=$(virsh --connect qemu:///system domifaddr instance3 | awk 'NR==3{print $4; exit}' | grep -o '^[^/]*')
+
+# generate an SSH key and exchange key between nodes so that nodes can SSH to eachother 
+# (after that ssh from each machine into every other one to add them to the known_hosts since 
+# we need ssh-less access from our machine to all nodes and from each node to every other node)
+ssh-keygen -q -t rsa -N '' -f ./id_rsa
+ssh-copy-id -i id_rsa ubuntu@$node1_ip
+ssh-copy-id -i id_rsa ubuntu@$node2_ip
+ssh-copy-id -i id_rsa ubuntu@$node3_ip
+scp id_rsa* ubuntu@$node1_ip:~/.ssh/
+scp id_rsa* ubuntu@$node2_ip:~/.ssh/
+scp id_rsa* ubuntu@$node3_ip:~/.ssh/
+
+# install java on all nodes
+ssh ubuntu@$node1_ip "sudo apt-get update && sudo apt-get -y install openjdk-8-jdk"
+ssh ubuntu@$node2_ip "sudo apt-get update && sudo apt-get -y install openjdk-8-jdk"
+ssh ubuntu@$node3_ip "sudo apt-get update && sudo apt-get -y install openjdk-8-jdk"
+
+# OPTIONAL: test java installation
+ssh ubuntu@$node1_ip "java -version"
+ssh ubuntu@$node2_ip "java -version"
+ssh ubuntu@$node3_ip "java -version"
+
+# configure JAVA_HOME environment variable
+ssh ubuntu@$node1_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node2_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node3_ip 'echo "JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"" | sudo tee -a /etc/environment'
+
+
+#######################
+# Hadoop Installation #
+#######################
+
+# download, unpack and rename the directory (for brevity) on all nodes
+ssh ubuntu@$node1_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
+ssh ubuntu@$node2_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
+ssh ubuntu@$node3_ip "wget -q https://mirror.synyx.de/apache/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz && tar xzf hadoop-3.3.0.tar.gz && mv hadoop-3.3.0 hadoop"
+
+# manually set hadoop java environment (just to be sure)
+ssh ubuntu@$node1_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
+ssh ubuntu@$node2_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
+ssh ubuntu@$node3_ip 'echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/hadoop/etc/hadoop/hadoop-env.sh'
+
+# move hadoop out of the home directory
+ssh ubuntu@$node1_ip "sudo mv hadoop /usr/local/hadoop"
+ssh ubuntu@$node2_ip "sudo mv hadoop /usr/local/hadoop"
+ssh ubuntu@$node3_ip "sudo mv hadoop /usr/local/hadoop"
+
+# add hadoop binaries to PATH environment variable
+ssh ubuntu@$node1_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node2_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node3_ip 'echo "PATH="/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH"" | sudo tee -a /etc/environment'
+
+# create directory to put all configuration files into (on local machine)
+mkdir hadoopconf
+
+# create the core hadoop configuration file
+cat > hadoopconf/core-site.xml <<EOF
+<configuration>
+<property>
+<name>fs.defaultFS</name>
+<value>hdfs://node1:9000</value>
+</property>
+</configuration>
+EOF
+
+# configure hdfs properties
+cat > hadoopconf/hdfs-site.xml <<EOF
+<configuration>
+<property>
+<name>dfs.namenode.name.dir</name><value>/usr/local/hadoop/data/nameNode</value>
+</property>
+<property>
+<name>dfs.datanode.data.dir</name><value>/usr/local/hadoop/data/dataNode</value>
+</property>
+<property>
+<name>dfs.replication</name>
+<value>2</value>
+</property>
+</configuration>
+EOF
+
+# configure worker nodes (all in this case)
+cat > hadoopconf/workers <<EOF
+node1
+node2
+node3
+EOF
+
+# copy config files to all cluster nodes
+scp hadoopconf/* ubuntu@$node1_ip:/usr/local/hadoop/etc/hadoop/
+scp hadoopconf/* ubuntu@$node2_ip:/usr/local/hadoop/etc/hadoop/
+scp hadoopconf/* ubuntu@$node3_ip:/usr/local/hadoop/etc/hadoop/
+
+# format hdfs and startup
+ssh ubuntu@$node1_ip hdfs namenode -format
+ssh ubuntu@$node1_ip start-dfs.sh
+
+######################
+# Flink installation #
+######################
+
+# download flink, unzip and rename the directory (for brevity) on each node
+ssh ubuntu@$node1_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
+ssh ubuntu@$node2_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
+ssh ubuntu@$node3_ip "wget -q https://apache.mirror.digionline.de/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.12.tgz && tar -xzf flink-1.12.1-bin-scala_2.12.tgz && mv flink-1.12.1 flink"
+
+# set the jobmanager host to the masternode (node1) in the config file on each node
+ssh ubuntu@$node1_ip 'echo "jobmanager.rpc.address: node1" >> flink/conf/flink-conf.yaml'
+ssh ubuntu@$node2_ip 'echo "jobmanager.rpc.address: node1" >> flink/conf/flink-conf.yaml'
+ssh ubuntu@$node3_ip 'echo "jobmanager.rpc.address: node1" >> flink/conf/flink-conf.yaml'
+
+# set the hadoop configuration directory in the config file on each node
+ssh ubuntu@$node1_ip 'echo "env.hadoop.conf.dir: /usr/local/hadoop/etc/hadoop" >> flink/conf/flink-conf.yaml'
+ssh ubuntu@$node2_ip 'echo "env.hadoop.conf.dir: /usr/local/hadoop/etc/hadoop" >> flink/conf/flink-conf.yaml'
+ssh ubuntu@$node3_ip 'echo "env.hadoop.conf.dir: /usr/local/hadoop/etc/hadoop" >> flink/conf/flink-conf.yaml'
+
+# move flink directory out of our home directory
+ssh ubuntu@$node1_ip 'sudo mv flink /usr/local/flink'
+ssh ubuntu@$node2_ip 'sudo mv flink /usr/local/flink'
+ssh ubuntu@$node3_ip 'sudo mv flink /usr/local/flink'
+
+# add required environment variables in order for flink to be able to access hdfs
+ssh ubuntu@$node1_ip 'echo "HADOOP_CLASSPATH=$(hadoop classpath)" | sudo tee -a /etc/environment'
+ssh ubuntu@$node2_ip 'echo "HADOOP_CLASSPATH=$(hadoop classpath)" | sudo tee -a /etc/environment'
+ssh ubuntu@$node3_ip 'echo "HADOOP_CLASSPATH=$(hadoop classpath)" | sudo tee -a /etc/environment'
+
+# add flink binaries to path variable
+ssh ubuntu@$node1_ip 'echo "PATH="/usr/local/flink/bin:$PATH"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node2_ip 'echo "PATH="/usr/local/flink/bin:$PATH"" | sudo tee -a /etc/environment'
+ssh ubuntu@$node3_ip 'echo "PATH="/usr/local/flink/bin:$PATH"" | sudo tee -a /etc/environment'
+
+# create configuration files for flink masters & workers
+mkdir flinkconf
+cat > flinkconf/master <<EOF
+node1
+EOF
+
+cat > flinkconf/workers <<EOF
+node1
+node2
+node3
+EOF
+
+# copy the configuration files to all nodes
+scp flinkconf/* ubuntu@$node1_ip:/usr/local/flink/conf
+scp flinkconf/* ubuntu@$node2_ip:/usr/local/flink/conf
+scp flinkconf/* ubuntu@$node3_ip:/usr/local/flink/conf
+
+# start the flink cluster
+ssh ubuntu@$node1_ip start-cluster.sh
