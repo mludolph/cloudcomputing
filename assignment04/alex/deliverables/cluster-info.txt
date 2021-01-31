@@ -1,0 +1,7 @@
+[0;32mKubernetes master[0m is running at [0;33mhttps://10.1.0.5:6443[0m
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+NAME    STATUS   ROLES    AGE     VERSION
+node1   Ready    master   9m27s   v1.18.10
+node2   Ready    master   8m15s   v1.18.10
+node3   Ready    master   8m15s   v1.18.10

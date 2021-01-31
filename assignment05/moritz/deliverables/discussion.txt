@@ -1,0 +1,12 @@
+1) Which steps in your program require communication and synchronization between your workers?
+The tokenization and filtering can happen in parallel. 
+Summing up the WordCount, finding the maximum WordCount for each word in the stream and sorting require both communication and synchronization since they have to aggregate over all partitions. 
+
+2) What resources is the job bound by? Memory? CPU? Network? Disk?
+Because of the high RAM (6GB per machine), memory is not a limiting factor.
+Although CPU and Disk speeds will have an impact, we suspect the largest limiting factor is the synchronization across
+the network which introduces overhead.
+
+3) Could you improve the partitioning of your data to yield better run-time?
+If there was a way to sort the words beforehand (e.g. lexicographic) and make sure that the same words are not split along partitions, we could improve the runtime.
+Without any assumption we don't see any way to improve the partitioning the data to yield a better run-time

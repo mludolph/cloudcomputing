@@ -1,0 +1,12 @@
+# create docker images
+sudo docker build -f frontend.Dockerfile -t alevator/images:ccfrontend .
+sudo docker build -f backend.Dockerfile -t alevator/images:ccbackend .
+
+
+#push images
+
+sudo docker push alevator/images:ccfrontend
+sudo docker push alevator/images:ccbackend
+
+# run created playbook
+ansible-playbook -i inventory/mycluster/hosts.yml webapp.yml
